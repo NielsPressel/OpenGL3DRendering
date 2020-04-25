@@ -1,0 +1,12 @@
+[submodule "OpenGL3DRendering/vendor/GLFW"]
+	path = OpenGL3DRendering/vendor/GLFW
+	url = https://github.com/TheCherno/glfw.git
+[submodule "OpenGL3DRendering/vendor/glm"]
+	path = OpenGL3DRendering/vendor/glm
+	url = https://github.com/g-truc/glm.git
+[submodule "OpenGL3DRendering/vendor/imgui"]
+	path = OpenGL3DRendering/vendor/imgui
+	url = https://github.com/TheCherno/imgui.git
+[submodule "OpenGL3DRendering/vendor/spdlog"]
+	path = OpenGL3DRendering/vendor/spdlog
+	url = https://github.com/gabime/spdlog.git
