@@ -3,6 +3,9 @@
 #include <string>
 #include <unordered_map>
 
+#include <glm/gtc/type_ptr.hpp>
+#include <glm/glm.hpp>
+
 namespace OpenGLRendering {
 
 	class Shader
@@ -13,6 +16,15 @@ namespace OpenGLRendering {
 
 		void Bind() const;
 		void Unbind() const;
+
+		void SetInt(const std::string& name, int value);
+		void SetIntArray(const std::string& name, int* values, uint32_t count);
+		void SetFloat(const std::string& name, float value);
+		void SetFloat2(const std::string& name, const glm::vec2& value);
+		void SetFloat3(const std::string& name, const glm::vec3& value);
+		void SetFloat4(const std::string& name, const glm::vec4& value);
+		void SetMat3(const std::string& name, const glm::mat3& value);
+		void SetMat4(const std::string& name, const glm::mat4& value);
 
 	private:
 		std::string ReadFile(const std::string& filePath);
