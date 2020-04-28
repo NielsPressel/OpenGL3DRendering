@@ -135,4 +135,27 @@ namespace OpenGLRendering {
 		float m_XOffset, m_YOffset;
 	};
 
+	class MouseMovedEvent : public Event
+	{
+	public:
+		MouseMovedEvent(float x, float y)
+			: m_MouseX(x), m_MouseY(y) { }
+
+		float GetX() const { return m_MouseX; }
+		float GetY() const { return m_MouseY; }
+
+		virtual std::string ToString() const override
+		{
+			std::stringstream ss;
+			ss << "MouseMovedEvent: " << GetX() << ", " << GetY();
+			return ss.str();
+		}
+
+		EVENT_CLASS_TYPE(MouseMoved);
+		EVENT_CLASS_CATEGORY(MouseCategory);
+
+	private:
+		float m_MouseX, m_MouseY;
+	};
+
 }

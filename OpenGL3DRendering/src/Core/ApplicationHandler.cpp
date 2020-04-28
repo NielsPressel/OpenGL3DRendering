@@ -61,11 +61,18 @@ namespace OpenGLRendering {
 		if (!m_Running)
 		{
 			OnStartup();
+			
+			float time = glfwGetTime();
+			float lastTime = time;
 
 			m_Running = true;
 			while (m_Running)
 			{
-				OnUpdate();
+				float time = glfwGetTime();
+				Timestep step = time - lastTime;
+				lastTime = time;
+
+				OnUpdate(step);
 			}
 		}
 	}
@@ -74,21 +81,34 @@ namespace OpenGLRendering {
 	{
 		float vertices[] =
 		{
-			 -0.5, -0.5,  0.5,
-			  0.5, -0.5,  0.5,
-			  0.5,  0.5,  0.5,
-			 -0.5,  0.5,  0.5
+			-1.0, -1.0,  1.0,
+			 1.0, -1.0,  1.0,
+			 1.0,  1.0,  1.0,
+			-1.0,  1.0,  1.0,
+			-1.0, -1.0, -1.0,
+			 1.0, -1.0, -1.0,
+			 1.0,  1.0, -1.0,
+			-1.0,  1.0, -1.0
 		};
 
 		uint32_t indices[] =
 		{
 			0, 1, 2,
 			2, 3, 0,
+			1, 5, 6,
+			6, 2, 1,
+			7, 6, 5,
+			5, 4, 7,
+			4, 0, 3,
+			3, 7, 4,
+			4, 5, 1,
+			1, 0, 4,
+			3, 2, 6,
+			6, 7, 3
 		};
 
 		m_Shader = std::make_unique<Shader>("src/ShaderSource/vertex.glsl", "src/ShaderSource/fragment.glsl");
 		m_Shader->Bind();
-
 
 		m_VertexArray = std::make_unique<VertexArray>();
 
@@ -99,16 +119,21 @@ namespace OpenGLRendering {
 				{ OpenGLRendering::ShaderDataType::Float3, "a_Position" },
 			});
 
-		std::shared_ptr<OpenGLRendering::IndexBuffer> indexBuffer = std::make_shared<OpenGLRendering::IndexBuffer>(indices, 6);
+		std::shared_ptr<OpenGLRendering::IndexBuffer> indexBuffer = std::make_shared<OpenGLRendering::IndexBuffer>(indices, 36);
 
 		m_VertexArray->AddVertexBuffer(vertexBuffer);
 		m_VertexArray->SetIndexBuffer(indexBuffer);
 
+		m_CameraController = std::make_unique<CameraController>(glm::vec3(0.0f, 0.0f, 2.0f));
+
 		glEnable(GL_DEPTH_TEST);
+		glfwSetInputMode(m_Window->GetNativeWindow(), GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 	}
 
-	void ApplicationHandler::OnUpdate()
+	void ApplicationHandler::OnUpdate(Timestep t)
 	{
+		m_CameraController->OnUpdate(t);
+
 		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -118,21 +143,38 @@ namespace OpenGLRendering {
 		}
 		else
 		{
-			m_Shader->SetFloat4("u_Color", { 0.8f, 0.2f, 0.3f, 1.0f });
+			m_Shader->SetFloat4("u_Color", { 0.2078f, 0.8078f, 0.902f, 1.0f });
 		}
+
+		float time = glfwGetTime();
+
+		glm::mat4 model = glm::translate(glm::mat4(1.0f), glm::vec3(0.0, 0.0, -4.0));
+		//model = glm::rotate(model, glm::radians(time * 10.0f), { 0.5f, 1.0f, 1.0f });
+
+		glm::mat4 view = m_CameraController->GetCamera().GetViewMatrix();
+		glm::mat4 projection = glm::perspective(45.0f, 1.0f * m_Window->GetWidth() / m_Window->GetHeight(), 0.1f, 100.0f);
+
+		glm::mat4 mvp = projection * view * model;
+
+		m_Shader->SetMat4("u_MVP", mvp);
 		
-		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
+		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+		glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, nullptr);
+
+		m_Shader->SetFloat4("u_Color", { 0.8f, 0.2f, 0.3f, 1.0f });
+		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+		glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, nullptr);
 
 		m_Window->OnUpdate();
 	}
 
 	void ApplicationHandler::OnEvent(Event& event)
 	{
+		m_CameraController->OnEvent(event);
+
 		EventDispatcher dispatcher(event);
 		dispatcher.Dispatch<WindowResizeEvent>(BIND_EVENT_FN(ApplicationHandler::OnWindowResize));
 		dispatcher.Dispatch<WindowCloseEvent>(BIND_EVENT_FN(ApplicationHandler::OnWindowClose));
-
-		OGL_TRACE("{0}", event.ToString());
 	}
 
 	bool ApplicationHandler::OnWindowResize(WindowResizeEvent& event)

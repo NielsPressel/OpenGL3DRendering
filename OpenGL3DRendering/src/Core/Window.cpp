@@ -68,6 +68,14 @@ namespace OpenGLRendering {
 			MouseScrolledEvent event(xOffset, yOffset);
 			data.EventCallback(event);
 		});
+
+		glfwSetCursorPosCallback(m_Handle, [](GLFWwindow* window, double xPos, double yPos)
+		{
+			WindowData& data = *(WindowData*)glfwGetWindowUserPointer(window);
+
+			MouseMovedEvent event(xPos, yPos);
+			data.EventCallback(event);
+		});
 	}
 
 	void Window::Shutdown()

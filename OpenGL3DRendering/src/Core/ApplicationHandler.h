@@ -1,9 +1,12 @@
 #pragma once
 
 #include "Event.h"
+#include "Timestep.h"
 #include "Window.h"
 #include "Renderer/Shader.h"
 #include "Renderer/VertexArray.h"
+
+#include "Core/CameraController.h"
 
 #include <memory>
 
@@ -22,7 +25,7 @@ namespace OpenGLRendering {
 
 	private:
 		void OnStartup();
-		void OnUpdate();
+		void OnUpdate(Timestep t);
 		void OnEvent(Event& event);
 
 		bool OnWindowResize(WindowResizeEvent& e);
@@ -33,6 +36,7 @@ namespace OpenGLRendering {
 		static ApplicationHandler* s_Instance;
 		
 		Window* m_Window;
+		std::unique_ptr<CameraController> m_CameraController;
 		std::unique_ptr<Shader> m_Shader;
 		std::unique_ptr<VertexArray> m_VertexArray;
 	};
