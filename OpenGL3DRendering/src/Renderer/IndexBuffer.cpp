@@ -5,7 +5,7 @@
 namespace OpenGLRendering {
 
 	IndexBuffer::IndexBuffer(uint32_t* indices, uint32_t count)
-		: mIndexCount(count)
+		: m_IndexCount(count)
 	{
 		glCreateBuffers(1, &m_RendererID);
 		glBindBuffer(GL_ARRAY_BUFFER, m_RendererID);

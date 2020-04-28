@@ -7,6 +7,7 @@
 #include "Renderer/VertexArray.h"
 
 #include "Core/CameraController.h"
+#include "Core/Object.h";
 
 #include <memory>
 
@@ -39,6 +40,7 @@ namespace OpenGLRendering {
 		std::unique_ptr<CameraController> m_CameraController;
 		std::unique_ptr<Shader> m_Shader;
 		std::unique_ptr<VertexArray> m_VertexArray;
+		std::unique_ptr<Object> m_Object;
 	};
 
 }

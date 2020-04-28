@@ -5,6 +5,8 @@
 
 #include "Core/Input/Input.h"
 
+#include "Utilities/ObjectLoader.h"
+
 #include "Renderer/IndexBuffer.h"
 #include "Renderer/VertexBuffer.h"
 
@@ -112,14 +114,23 @@ namespace OpenGLRendering {
 
 		m_VertexArray = std::make_unique<VertexArray>();
 
+		std::unique_ptr<Object> object = std::make_unique<Object>();
+		ObjectLoader::LoadObject("C:/Users/niels/OneDrive/Desktop/test.obj", object.get());
 
-		std::shared_ptr<OpenGLRendering::VertexBuffer> vertexBuffer = std::make_shared<OpenGLRendering::VertexBuffer>(vertices, sizeof(vertices));
+		uint32_t vertexBufferCount;
+		float* vertexBufferData = object->GetVertexBuffer(&vertexBufferCount);
+
+		uint32_t indexBufferCount;
+		uint32_t* indexBufferData = object->GetIndexBuffer(&indexBufferCount);
+
+		std::shared_ptr<OpenGLRendering::VertexBuffer> vertexBuffer = std::make_shared<OpenGLRendering::VertexBuffer>(vertexBufferData, vertexBufferCount * sizeof(float));
 		vertexBuffer->SetLayout(
 			{
 				{ OpenGLRendering::ShaderDataType::Float3, "a_Position" },
+				{ OpenGLRendering::ShaderDataType::Float3, "a_Normal" },
 			});
 
-		std::shared_ptr<OpenGLRendering::IndexBuffer> indexBuffer = std::make_shared<OpenGLRendering::IndexBuffer>(indices, 36);
+		std::shared_ptr<OpenGLRendering::IndexBuffer> indexBuffer = std::make_shared<OpenGLRendering::IndexBuffer>(indexBufferData, indexBufferCount);
 
 		m_VertexArray->AddVertexBuffer(vertexBuffer);
 		m_VertexArray->SetIndexBuffer(indexBuffer);
@@ -154,16 +165,17 @@ namespace OpenGLRendering {
 		glm::mat4 view = m_CameraController->GetCamera().GetViewMatrix();
 		glm::mat4 projection = glm::perspective(45.0f, 1.0f * m_Window->GetWidth() / m_Window->GetHeight(), 0.1f, 100.0f);
 
-		glm::mat4 mvp = projection * view * model;
-
-		m_Shader->SetMat4("u_MVP", mvp);
+		m_Shader->SetMat4("u_Model", model);
+		m_Shader->SetMat4("u_View", view);
+		m_Shader->SetMat4("u_Projection", projection);
+		m_Shader->SetFloat3("u_LightPos", { 0.0f, 0.0f, 2.0f });
 		
-		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-		glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, nullptr);
+		//glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+		//glDrawElements(GL_TRIANGLES, m_VertexArray->GetIndexBuffer()->GetIndexCount(), GL_UNSIGNED_INT, nullptr);
 
 		m_Shader->SetFloat4("u_Color", { 0.8f, 0.2f, 0.3f, 1.0f });
-		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-		glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, nullptr);
+		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+		glDrawElements(GL_TRIANGLES, m_VertexArray->GetIndexBuffer()->GetIndexCount(), GL_UNSIGNED_INT, nullptr);
 
 		m_Window->OnUpdate();
 	}

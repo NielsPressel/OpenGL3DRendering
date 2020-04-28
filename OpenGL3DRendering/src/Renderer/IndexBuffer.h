@@ -12,9 +12,11 @@ namespace OpenGLRendering {
 		void Bind() const;
 		void Unbind() const;
 
+		uint32_t GetIndexCount() const { return m_IndexCount; }
+
 	private:
 		uint32_t m_RendererID;
-		uint32_t mIndexCount;
+		uint32_t m_IndexCount;
 	};
 
 }
