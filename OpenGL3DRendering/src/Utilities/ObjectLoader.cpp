@@ -1,162 +1,105 @@
 #include "ObjectLoader.h"
-
-#include <fstream>
-#include <sstream>
-#include <string>
-#include <vector>
+#include "Core/Log.h"
+#include "Core/Core.h"
 
 #include <glm/glm.hpp>
 
+#include <assimp/Importer.hpp>
+#include <assimp/postprocess.h>
+
 namespace OpenGLRendering {
 
-	typedef glm::vec<3, uint32_t, glm::defaultp> vec3int;
+	Mesh::Mesh() { }
 
-	class Chlit
+	Mesh::~Mesh() { }
+
+	bool Mesh::LoadMesh(const std::string& filePath)
 	{
-	public:
-		Chlit(char c)
-			: m_Char(c) { }
+		Clear();
 
-		char GetChar() const { return m_Char; }
+		Assimp::Importer importer;
 
-	private:
-		char m_Char;
-	};
+		const aiScene* scene = importer.ReadFile(filePath.c_str(), aiProcess_Triangulate | aiProcess_GenSmoothNormals | aiProcess_JoinIdenticalVertices);
 
-	class Face
-	{
-	public:
-		Face() = default;
-
-		Face(const vec3int& vertexIndices, const vec3int& textureIndices, uint32_t normalIndex)
-			: m_VertexIndices(vertexIndices), m_TextureIndices(textureIndices), m_NormalIndex(normalIndex) { }
-
-		bool IsVertexInFace(uint32_t vertexIndex) const
+		if (scene)
 		{
-			return vertexIndex == m_VertexIndices.x || vertexIndex == m_VertexIndices.y || vertexIndex == m_VertexIndices.z;
+			return InitFromScene(scene, filePath);
+		}
+		else
+		{
+			OGL_WARN("Couldn't read scene from file {0}", filePath);
 		}
 
-		uint32_t GetNormalIndex() const { return m_NormalIndex; }
-		const vec3int& GetIndices() const { return m_VertexIndices; }
+		return false;
+	}
 
-	private:
-		vec3int m_VertexIndices;
-		vec3int m_TextureIndices;
-		uint32_t m_NormalIndex;
-	};
-
-	std::istream& operator>>(std::istream& is, Chlit chlit)
+	bool Mesh::InitFromScene(const aiScene* scene, const std::string& filePath)
 	{
-		char c;
-		if (is >> c && c != chlit.GetChar())
+		m_Entries.resize(scene->mNumMeshes);
+		m_Textures.resize(scene->mNumMaterials);
+
+		for (unsigned int i = 0; i < scene->mNumMeshes; i++)
 		{
-			is.setstate(std::iostream::failbit);
+			const aiMesh* mesh = scene->mMeshes[i];
+			InitMesh(i, mesh);
 		}
 
-		return is;
+		return InitMaterials(scene, filePath);
 	}
 
-	inline void ltrim(std::string& s) {
-		s.erase(s.begin(), std::find_if(s.begin(), s.end(), [](int ch) {
-			return !std::isspace(ch);
-			}));
-	}
-
-
-	void ObjectLoader::LoadObject(const std::string & filePath, Object* obj)
+	void Mesh::InitMesh(uint32_t index, const aiMesh* mesh)
 	{
-		std::ifstream input(filePath, std::ios::in | std::ios::binary);
+		m_Entries[index].MaterialIndex = mesh->mMaterialIndex;
 
-		if (input.is_open())
+		std::vector<Assimp::Vertex> vertices;
+		std::vector<uint32_t> indices;
+
+		vertices.reserve(mesh->mNumVertices);
+		indices.reserve((long long)mesh->mNumFaces * 3);
+
+		const aiVector3D Zero3D(0.0f, 0.0f, 0.0f);
+
+		for (unsigned int i = 0; i < mesh->mNumVertices; i++)
 		{
-			std::vector<glm::vec3> positions;
-			std::vector<Face> faces;
-			std::vector<glm::vec3> normals;
-
-			std::string line;
-
-			while (std::getline(input, line))
-			{
-				ltrim(line);
-				std::string firstWord = line.substr(0, line.find(" "));
-
-				if (firstWord == "v")
-				{
-					glm::vec3 vertex;
-
-					std::istringstream iss(line.substr(line.find(" "), line.length()));
-					iss >> vertex.x >> vertex.y >> vertex.z;
-
-					positions.push_back(vertex);
-				}
-				else if (firstWord == "vn")
-				{
-					glm::vec3 normal;
-
-					std::istringstream iss(line.substr(line.find(" "), line.length()));
-
-					iss >> normal.x >> normal.y >> normal.z;
-
-					normals.push_back(normal);
-				}
-				else if (firstWord == "f")
-				{
-					vec3int position;
-					vec3int texture;
-					uint32_t normal;
-
-					std::istringstream iss(line.substr(line.find(" "), line.length()));
-
-					iss >> position.x >> Chlit('/') >> texture.x >> Chlit('/') >> normal;
-
-					iss >> position.y >> Chlit('/') >> texture.y >> Chlit('/') >> normal;
-
-					iss >> position.z >> Chlit('/') >> texture.z >> Chlit('/') >> normal;
-					
-					faces.push_back({ position, texture, normal });
-				}
-				
-			}
-
-			float* vertexBuffer = new float[positions.size() * 6];
-
-			for (unsigned int i = 1; i < positions.size() + 1; i++)
-			{
-				glm::vec3 normalSum(0.0f, 0.0f, 0.0f);
-				float count = 0.0f;
-
-				for (const Face& face : faces)
-				{
-					if (face.IsVertexInFace(i))
-					{
-						normalSum += normals[face.GetNormalIndex() - 1];
-						count++;
-					}
-				}
-
-				glm::vec3 normalAvg = normalSum / count;
-
-				vertexBuffer[(i - 1) * 6 + 0] = positions[i - 1].x;
-				vertexBuffer[(i - 1) * 6 + 1] = positions[i - 1].y;
-				vertexBuffer[(i - 1) * 6 + 2] = positions[i - 1].z;
-				vertexBuffer[(i - 1) * 6 + 3] = normalAvg.x;
-				vertexBuffer[(i - 1) * 6 + 4] = normalAvg.y;
-				vertexBuffer[(i - 1) * 6 + 5] = normalAvg.z;
-			}
-
-			uint32_t* indexBuffer = new uint32_t[faces.size() * 3];
-
-			for (unsigned int i = 0; i < faces.size(); i++)
-			{
-				const auto& indices = faces[i].GetIndices();
-
-				indexBuffer[i * 3 + 0] = indices.x - 1;
-				indexBuffer[i * 3 + 1] = indices.y - 1;
-				indexBuffer[i * 3 + 2] = indices.z - 1;
-			}
-
-			obj->SetVertexBuffer(vertexBuffer, positions.size() * 6);
-			obj->SetIndexBuffer(indexBuffer, faces.size() * 3);
+			vertices.push_back(Assimp::Vertex(mesh, i));
 		}
+
+		for (unsigned int i = 0; i < mesh->mNumFaces; i++)
+		{
+			const aiFace& face = mesh->mFaces[i];
+			OGL_ASSERT(face.mNumIndices == 3, "Importer tried to parse a non triangular face");
+
+			indices.push_back(face.mIndices[0]);
+			indices.push_back(face.mIndices[1]);
+			indices.push_back(face.mIndices[2]);
+		}
+
+		m_Entries[index].Init(vertices, indices);
 	}
+
+	bool Mesh::InitMaterials(const aiScene* scene, const std::string& filePath)
+	{
+		return true;
+	}
+
+	void Mesh::Clear()
+	{
+
+	}
+
+	Mesh::MeshEntry::MeshEntry()
+	{
+
+	}
+
+	Mesh::MeshEntry::~MeshEntry()
+	{
+
+	}
+
+	bool Mesh::MeshEntry::Init(const std::vector<Assimp::Vertex>& vertices, const std::vector<uint32_t>& indices)
+	{
+		return true;
+	}
+
 }

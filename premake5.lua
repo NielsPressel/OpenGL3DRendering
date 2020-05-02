@@ -22,6 +22,7 @@ IncludeDir["Glad"] = "OpenGL3DRendering/vendor/Glad/include"
 IncludeDir["ImGui"] = "OpenGL3DRendering/vendor/imgui"
 IncludeDir["glm"] = "OpenGL3DRendering/vendor/glm"
 IncludeDir["stb_image"] = "OpenGL3DRendering/vendor/stb_image"
+IncludeDir["Assimp"] = "OpenGL3DRendering/vendor/assimp/include"
 
 group "Dependencies"
 	include "OpenGL3DRendering/vendor/GLFW"
@@ -61,16 +62,11 @@ project "OpenGL3DRendering"
 		"%{IncludeDir.GLFW}",
 		"%{IncludeDir.Glad}",
 		"%{IncludeDir.glm}",
-		"%{IncludeDir.stb_image}"
+		"%{IncludeDir.stb_image}",
+		"%{IncludeDir.Assimp}"
 	}
 
-	links
-	{
-		"GLFW",
-		"Glad",
-		"ImGui",
-		"opengl32.lib"
-	}
+	
 
 	filter "system:windows"
 		systemversion "latest"
@@ -80,12 +76,55 @@ project "OpenGL3DRendering"
 		runtime "Debug"
 		symbols "on"
 
+		libdirs 
+		{ 
+			"assimp", "%{prj.name}/vendor/assimp/lib/Debug"
+		}
+
+		links
+		{
+			"GLFW",
+			"Glad",
+			"ImGui",
+			"assimpd.lib",
+			"opengl32.lib"
+		}
+
 	filter "configurations:Release"
 		defines "OGL_RELEASE"
 		runtime "Release"
 		optimize "on"
 
+		libdirs 
+		{ 
+			"assimp", "%{prj.name}/vendor/assimp/lib/Release"
+		}
+
+		links
+		{
+			"GLFW",
+			"Glad",
+			"ImGui",
+			"assimp.lib",
+			"opengl32.lib"
+		}
+
+
 	filter "configurations:Dist"
 		defines "OGL_DIST"
 		runtime "Release"
 		optimize "on"
+
+		libdirs 
+		{ 
+			"assimp", "%{prj.name}/vendor/assimp/lib/Release"
+		}
+
+		links
+		{
+			"GLFW",
+			"Glad",
+			"ImGui",
+			"assimp.lib.lib",
+			"opengl32.lib"
+		}

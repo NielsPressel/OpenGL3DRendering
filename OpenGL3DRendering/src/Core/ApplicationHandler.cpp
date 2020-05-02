@@ -115,7 +115,7 @@ namespace OpenGLRendering {
 		m_VertexArray = std::make_unique<VertexArray>();
 
 		std::unique_ptr<Object> object = std::make_unique<Object>();
-		ObjectLoader::LoadObject("C:/Users/niels/OneDrive/Desktop/test.obj", object.get());
+		//ObjectLoader::LoadObject("C:/Users/niels/OneDrive/Desktop/bugatti.obj", object.get());
 
 		uint32_t vertexBufferCount;
 		float* vertexBufferData = object->GetVertexBuffer(&vertexBufferCount);
@@ -160,7 +160,7 @@ namespace OpenGLRendering {
 		float time = glfwGetTime();
 
 		glm::mat4 model = glm::translate(glm::mat4(1.0f), glm::vec3(0.0, 0.0, -4.0));
-		//model = glm::rotate(model, glm::radians(time * 10.0f), { 0.5f, 1.0f, 1.0f });
+		// model = glm::rotate(model, glm::radians(time * 10.0f), { 0.5f, 1.0f, 1.0f });
 
 		glm::mat4 view = m_CameraController->GetCamera().GetViewMatrix();
 		glm::mat4 projection = glm::perspective(45.0f, 1.0f * m_Window->GetWidth() / m_Window->GetHeight(), 0.1f, 100.0f);
@@ -168,12 +168,12 @@ namespace OpenGLRendering {
 		m_Shader->SetMat4("u_Model", model);
 		m_Shader->SetMat4("u_View", view);
 		m_Shader->SetMat4("u_Projection", projection);
-		m_Shader->SetFloat3("u_LightPos", { 0.0f, 0.0f, 2.0f });
+		m_Shader->SetFloat3("u_LightPos", { cos(glm::radians(time) * 10.0f) * 10.0f ,  0.0f, sin(glm::radians(time) * 10.0f) * 10.0f });
 		
 		//glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 		//glDrawElements(GL_TRIANGLES, m_VertexArray->GetIndexBuffer()->GetIndexCount(), GL_UNSIGNED_INT, nullptr);
 
-		m_Shader->SetFloat4("u_Color", { 0.8f, 0.2f, 0.3f, 1.0f });
+		//m_Shader->SetFloat4("u_Color", { 0.8f, 0.2f, 0.3f, 1.0f });
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 		glDrawElements(GL_TRIANGLES, m_VertexArray->GetIndexBuffer()->GetIndexCount(), GL_UNSIGNED_INT, nullptr);
 
