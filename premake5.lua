@@ -86,7 +86,8 @@ project "OpenGL3DRendering"
 			"GLFW",
 			"Glad",
 			"ImGui",
-			"assimpd.lib",
+			"assimp-vc142-mtd.lib",
+			"IrrXMLd.lib",
 			"opengl32.lib"
 		}
 
@@ -105,7 +106,8 @@ project "OpenGL3DRendering"
 			"GLFW",
 			"Glad",
 			"ImGui",
-			"assimp.lib",
+			"assimp-vc142-mt.lib",
+			"IrrXML.lib",
 			"opengl32.lib"
 		}
 

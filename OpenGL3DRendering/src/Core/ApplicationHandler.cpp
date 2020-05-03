@@ -5,33 +5,17 @@
 
 #include "Core/Input/Input.h"
 
-#include "Utilities/ObjectLoader.h"
-
 #include "Renderer/IndexBuffer.h"
 #include "Renderer/VertexBuffer.h"
+#include "Renderer/RendererAPI.h"
+#include "Renderer/Texture.h"
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
 namespace OpenGLRendering {
 
-	void OpenGLMessageCallback(
-		unsigned source,
-		unsigned type,
-		unsigned id,
-		unsigned severity,
-		int length,
-		const char* message,
-		const void* userParam)
-	{
-		switch (severity)
-		{
-		case GL_DEBUG_SEVERITY_HIGH:         OGL_CRITICAL(message); return;
-		case GL_DEBUG_SEVERITY_MEDIUM:       OGL_ERROR(message); return;
-		case GL_DEBUG_SEVERITY_LOW:          OGL_WARN(message); return;
-		case GL_DEBUG_SEVERITY_NOTIFICATION: OGL_TRACE(message); return;
-		}
-	}
+	
 
 	ApplicationHandler* ApplicationHandler::s_Instance = nullptr;
 
@@ -44,13 +28,7 @@ namespace OpenGLRendering {
 		m_Window = new Window({ "Niels Pressel" });
 		m_Window->SetEventCallback(BIND_EVENT_FN(ApplicationHandler::OnEvent));
 
-#ifdef OGL_DEBUG
-		glEnable(GL_DEBUG_OUTPUT);
-		glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
-		glDebugMessageCallback(OpenGLMessageCallback, nullptr);
-
-		glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DEBUG_SEVERITY_NOTIFICATION, 0, NULL, GL_FALSE);
-#endif
+		RendererAPI::Init();
 	}
 
 	ApplicationHandler::~ApplicationHandler()
@@ -109,44 +87,22 @@ namespace OpenGLRendering {
 			6, 7, 3
 		};
 
-		m_Shader = std::make_unique<Shader>("src/ShaderSource/vertex.glsl", "src/ShaderSource/fragment.glsl");
+		m_Shader = std::make_unique<Shader>("src/Resources/ShaderSource/vertex.glsl", "src/Resources/ShaderSource/fragment.glsl");
 		m_Shader->Bind();
 
-		m_VertexArray = std::make_unique<VertexArray>();
-
-		std::unique_ptr<Object> object = std::make_unique<Object>();
-		//ObjectLoader::LoadObject("C:/Users/niels/OneDrive/Desktop/bugatti.obj", object.get());
-
-		uint32_t vertexBufferCount;
-		float* vertexBufferData = object->GetVertexBuffer(&vertexBufferCount);
-
-		uint32_t indexBufferCount;
-		uint32_t* indexBufferData = object->GetIndexBuffer(&indexBufferCount);
-
-		std::shared_ptr<OpenGLRendering::VertexBuffer> vertexBuffer = std::make_shared<OpenGLRendering::VertexBuffer>(vertexBufferData, vertexBufferCount * sizeof(float));
-		vertexBuffer->SetLayout(
-			{
-				{ OpenGLRendering::ShaderDataType::Float3, "a_Position" },
-				{ OpenGLRendering::ShaderDataType::Float3, "a_Normal" },
-			});
-
-		std::shared_ptr<OpenGLRendering::IndexBuffer> indexBuffer = std::make_shared<OpenGLRendering::IndexBuffer>(indexBufferData, indexBufferCount);
-
-		m_VertexArray->AddVertexBuffer(vertexBuffer);
-		m_VertexArray->SetIndexBuffer(indexBuffer);
+		m_Model = std::make_unique<Model>("src/Resources/Assets/Sniper_Rifle_Textured.fbx");
 
 		m_CameraController = std::make_unique<CameraController>(glm::vec3(0.0f, 0.0f, 2.0f));
 
-		glEnable(GL_DEPTH_TEST);
 		glfwSetInputMode(m_Window->GetNativeWindow(), GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+
+		RendererAPI::SetClearColor({ 0.0f, 0.0f, 0.0f, 1.0f });
 	}
 
 	void ApplicationHandler::OnUpdate(Timestep t)
 	{
 		m_CameraController->OnUpdate(t);
-
-		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		RendererAPI::Clear();
 
 		if (Input::IsMouseButtonPressed(OGL_MOUSE_BUTTON_LEFT))
 		{
@@ -160,7 +116,7 @@ namespace OpenGLRendering {
 		float time = glfwGetTime();
 
 		glm::mat4 model = glm::translate(glm::mat4(1.0f), glm::vec3(0.0, 0.0, -4.0));
-		// model = glm::rotate(model, glm::radians(time * 10.0f), { 0.5f, 1.0f, 1.0f });
+		model = glm::rotate(model, glm::radians(-90.0f), { 1.0f, 0.0f, 0.0f });
 
 		glm::mat4 view = m_CameraController->GetCamera().GetViewMatrix();
 		glm::mat4 projection = glm::perspective(45.0f, 1.0f * m_Window->GetWidth() / m_Window->GetHeight(), 0.1f, 100.0f);
@@ -169,13 +125,10 @@ namespace OpenGLRendering {
 		m_Shader->SetMat4("u_View", view);
 		m_Shader->SetMat4("u_Projection", projection);
 		m_Shader->SetFloat3("u_LightPos", { cos(glm::radians(time) * 10.0f) * 10.0f ,  0.0f, sin(glm::radians(time) * 10.0f) * 10.0f });
-		
-		//glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-		//glDrawElements(GL_TRIANGLES, m_VertexArray->GetIndexBuffer()->GetIndexCount(), GL_UNSIGNED_INT, nullptr);
+		m_Shader->SetFloat3("u_ViewPos", m_CameraController->GetCamera().GetPosition());
 
-		//m_Shader->SetFloat4("u_Color", { 0.8f, 0.2f, 0.3f, 1.0f });
-		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-		glDrawElements(GL_TRIANGLES, m_VertexArray->GetIndexBuffer()->GetIndexCount(), GL_UNSIGNED_INT, nullptr);
+		//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+		m_Model->Render(*m_Shader.get());
 
 		m_Window->OnUpdate();
 	}
