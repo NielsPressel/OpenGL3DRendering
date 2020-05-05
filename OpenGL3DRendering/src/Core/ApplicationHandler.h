@@ -6,6 +6,8 @@
 #include "Renderer/Shader.h"
 #include "Renderer/VertexArray.h"
 
+#include "ImGui/ImGuiLayer.h"
+
 #include "Core/CameraController.h"
 #include "Utilities/Model.h"
 
@@ -27,6 +29,7 @@ namespace OpenGLRendering {
 	private:
 		void OnStartup();
 		void OnUpdate(Timestep t);
+		void OnImGuiRender();
 		void OnEvent(Event& event);
 
 		bool OnWindowResize(WindowResizeEvent& e);
@@ -37,6 +40,7 @@ namespace OpenGLRendering {
 		static ApplicationHandler* s_Instance;
 		
 		Window* m_Window;
+		std::unique_ptr<ImGuiLayer> m_ImGuiLayer;
 		std::unique_ptr<CameraController> m_CameraController;
 		std::unique_ptr<Shader> m_Shader;
 		std::unique_ptr<Model> m_Model;

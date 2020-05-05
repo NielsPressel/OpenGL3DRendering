@@ -10,6 +10,7 @@
 
 #include <assimp/Importer.hpp>
 #include <assimp/postprocess.h>
+#include <assimp/pbrmaterial.h>
 
 namespace OpenGLRendering {
 
@@ -181,14 +182,14 @@ namespace OpenGLRendering {
 			}
 			else
 			{
-				textures.push_back(std::make_shared<Texture2D>(path, TextureType::DIFFUSE));
+				textures.push_back(std::make_shared<Texture2D>("src/Resources/Assets/" + path, TextureType::DIFFUSE));
 			}
 		}
 
 		return textures;
 	}
 
-	void Model::Render(const Shader& shader) const
+	void Model::Render(Shader& shader) const
 	{
 		for (const Mesh& mesh : m_Meshes)
 		{

@@ -36,7 +36,7 @@ namespace OpenGLRendering {
 		m_VertexArray->SetIndexBuffer(indexBuffer);
 	}
 
-	void Mesh::Render(const Shader& shader) const
+	void Mesh::Render(Shader& shader) const
 	{
 		shader.Bind();
 		m_VertexArray->Bind();

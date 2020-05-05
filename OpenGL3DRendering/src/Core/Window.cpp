@@ -40,6 +40,7 @@ namespace OpenGLRendering {
 		m_Context = std::make_unique<OpenGLContext>(m_Handle);
 		m_Context->Init();
 
+		glfwWindowHint(GLFW_SAMPLES, 8);
 		glfwSetWindowUserPointer(m_Handle, &m_Data);
 
 		glfwSetWindowSizeCallback(m_Handle, [](GLFWwindow* window, int width, int height)

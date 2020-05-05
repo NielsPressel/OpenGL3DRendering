@@ -12,6 +12,7 @@
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
+#include <imgui.h>
 
 namespace OpenGLRendering {
 
@@ -27,6 +28,9 @@ namespace OpenGLRendering {
 
 		m_Window = new Window({ "Niels Pressel" });
 		m_Window->SetEventCallback(BIND_EVENT_FN(ApplicationHandler::OnEvent));
+		m_Window->SetVsync(true);
+
+		m_ImGuiLayer = std::make_unique<ImGuiLayer>();
 
 		RendererAPI::Init();
 	}
@@ -41,6 +45,7 @@ namespace OpenGLRendering {
 		if (!m_Running)
 		{
 			OnStartup();
+			m_ImGuiLayer->OnStart();
 			
 			float time = glfwGetTime();
 			float lastTime = time;
@@ -53,6 +58,10 @@ namespace OpenGLRendering {
 				lastTime = time;
 
 				OnUpdate(step);
+
+				m_ImGuiLayer->Begin();
+				OnImGuiRender();
+				m_ImGuiLayer->End();
 			}
 		}
 	}
@@ -90,11 +99,11 @@ namespace OpenGLRendering {
 		m_Shader = std::make_unique<Shader>("src/Resources/ShaderSource/vertex.glsl", "src/Resources/ShaderSource/fragment.glsl");
 		m_Shader->Bind();
 
-		m_Model = std::make_unique<Model>("src/Resources/Assets/Sniper_Rifle_Textured.fbx");
+		m_Model = std::make_unique<Model>("src/Resources/Assets/cottage_fbx.fbx");
 
 		m_CameraController = std::make_unique<CameraController>(glm::vec3(0.0f, 0.0f, 2.0f));
 
-		glfwSetInputMode(m_Window->GetNativeWindow(), GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+		//glfwSetInputMode(m_Window->GetNativeWindow(), GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
 		RendererAPI::SetClearColor({ 0.0f, 0.0f, 0.0f, 1.0f });
 	}
@@ -117,6 +126,7 @@ namespace OpenGLRendering {
 
 		glm::mat4 model = glm::translate(glm::mat4(1.0f), glm::vec3(0.0, 0.0, -4.0));
 		model = glm::rotate(model, glm::radians(-90.0f), { 1.0f, 0.0f, 0.0f });
+		//model = glm::scale(model, { 0.01, 0.01, 0.01 });
 
 		glm::mat4 view = m_CameraController->GetCamera().GetViewMatrix();
 		glm::mat4 projection = glm::perspective(45.0f, 1.0f * m_Window->GetWidth() / m_Window->GetHeight(), 0.1f, 100.0f);
@@ -131,6 +141,13 @@ namespace OpenGLRendering {
 		m_Model->Render(*m_Shader.get());
 
 		m_Window->OnUpdate();
+	}
+
+	void ApplicationHandler::OnImGuiRender()
+	{
+		ImGui::Begin("Settings");
+		ImGui::Text("Cooler Text");
+		ImGui::End();
 	}
 
 	void ApplicationHandler::OnEvent(Event& event)

@@ -17,7 +17,7 @@ namespace OpenGLRendering {
 		Model(const std::string& filePath);
 		~Model();
 		
-		void Render(const Shader& shader) const;
+		void Render(Shader& shader) const;
 
 	private:
 		void LoadModel(const std::string& filePath);

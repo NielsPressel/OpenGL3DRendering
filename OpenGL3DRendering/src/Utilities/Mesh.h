@@ -25,7 +25,7 @@ namespace OpenGLRendering {
 		Mesh(const std::vector<Vertex>& vertices, const std::vector<uint32_t>& indices, const std::vector<std::shared_ptr<Texture2D>>& textures);
 		~Mesh();
 
-		void Render(const Shader& shader) const;
+		void Render(Shader& shader) const;
 
 	private:
 		void Init(const std::vector<Vertex>& vertices, const std::vector<uint32_t>& indices, const std::vector<std::shared_ptr<Texture2D>>& textures);

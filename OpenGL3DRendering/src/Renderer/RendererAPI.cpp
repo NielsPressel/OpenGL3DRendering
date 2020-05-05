@@ -36,6 +36,9 @@ namespace OpenGLRendering {
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 		glEnable(GL_DEPTH_TEST);
+		glEnable(GL_CULL_FACE);
+		glEnable(GL_MULTISAMPLE);
+		//glEnable(GL_FRAMEBUFFER_SRGB);
 	}
 
 	void RendererAPI::SetClearColor(const glm::vec4& color)

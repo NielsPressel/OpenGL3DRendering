@@ -136,51 +136,63 @@ namespace OpenGLRendering {
 		}
 	}
 
-	void Shader::SetInt(const std::string& name, int value) const
+	int32_t Shader::GetUniformLocation(const std::string& name)
 	{
-		int32_t location = glGetUniformLocation(m_RendererID, name.c_str());
+		if (m_UniformLocations.find(name) == m_UniformLocations.end())
+		{
+			int32_t location = glGetUniformLocation(m_RendererID, name.c_str());
+			m_UniformLocations[name] = location;
+			return location;
+		}
+
+		return m_UniformLocations[name];
+	}
+
+	void Shader::SetInt(const std::string& name, int value)
+	{
+		int32_t location = GetUniformLocation(name);
 		glUniform1i(location, value);
 	}
 
-	void Shader::SetIntArray(const std::string& name, int* values, uint32_t count) const
+	void Shader::SetIntArray(const std::string& name, int* values, uint32_t count)
 	{
-		int32_t location = glGetUniformLocation(m_RendererID, name.c_str());
+		int32_t location = GetUniformLocation(name);
 		glUniform1iv(location, count, values);
 	}
 
-	void Shader::SetFloat(const std::string& name, float value) const
+	void Shader::SetFloat(const std::string& name, float value)
 	{
-		int32_t location = glGetUniformLocation(m_RendererID, name.c_str());
+		int32_t location = GetUniformLocation(name);
 		glUniform1f(location, value);
 	}
 
-	void Shader::SetFloat2(const std::string& name, const glm::vec2& value) const
+	void Shader::SetFloat2(const std::string& name, const glm::vec2& value)
 	{
-		int32_t location = glGetUniformLocation(m_RendererID, name.c_str());
+		int32_t location = GetUniformLocation(name);
 		glUniform2f(location, value.x, value.y);
 	}
 
-	void Shader::SetFloat3(const std::string& name, const glm::vec3& value) const
+	void Shader::SetFloat3(const std::string& name, const glm::vec3& value)
 	{
-		int32_t location = glGetUniformLocation(m_RendererID, name.c_str());
+		int32_t location = GetUniformLocation(name);
 		glUniform3f(location, value.x, value.y, value.z);
 	}
 
-	void Shader::SetFloat4(const std::string& name, const glm::vec4& value) const
+	void Shader::SetFloat4(const std::string& name, const glm::vec4& value)
 	{
-		int32_t location = glGetUniformLocation(m_RendererID, name.c_str());
+		int32_t location = GetUniformLocation(name);
 		glUniform4f(location, value.x, value.y, value.z, value.w);
 	}
 
-	void Shader::SetMat3(const std::string& name, const glm::mat3& value) const
+	void Shader::SetMat3(const std::string& name, const glm::mat3& value)
 	{
-		int32_t location = glGetUniformLocation(m_RendererID, name.c_str());
+		int32_t location = GetUniformLocation(name);
 		glUniformMatrix3fv(location, 1, GL_FALSE, glm::value_ptr(value));
 	}
 
-	void Shader::SetMat4(const std::string& name, const glm::mat4& value) const
+	void Shader::SetMat4(const std::string& name, const glm::mat4& value)
 	{
-		int32_t location = glGetUniformLocation(m_RendererID, name.c_str());
+		int32_t location = GetUniformLocation(name);
 		glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(value));
 	}
 }
