@@ -8,6 +8,7 @@
 
 #include "Core/OpenGLContext.h"
 #include "Core/Event.h"
+#include "Core/Core.h"
 
 namespace OpenGLRendering {
 
@@ -47,7 +48,7 @@ namespace OpenGLRendering {
 
 	private:
 		GLFWwindow* m_Handle;
-		std::unique_ptr<OpenGLContext> m_Context;
+		Scope<OpenGLContext> m_Context;
 
 		struct WindowData
 		{

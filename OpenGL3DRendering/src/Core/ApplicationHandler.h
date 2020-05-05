@@ -10,8 +10,7 @@
 
 #include "Core/CameraController.h"
 #include "Utilities/Model.h"
-
-#include <memory>
+#include "Core/Core.h"
 
 namespace OpenGLRendering {
 
@@ -40,10 +39,10 @@ namespace OpenGLRendering {
 		static ApplicationHandler* s_Instance;
 		
 		Window* m_Window;
-		std::unique_ptr<ImGuiLayer> m_ImGuiLayer;
-		std::unique_ptr<CameraController> m_CameraController;
-		std::unique_ptr<Shader> m_Shader;
-		std::unique_ptr<Model> m_Model;
+		Scope<ImGuiLayer> m_ImGuiLayer;
+		Scope<CameraController> m_CameraController;
+		Scope<Shader> m_Shader;
+		Scope<Model> m_Model;
 	};
 
 }

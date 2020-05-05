@@ -15,8 +15,6 @@
 
 namespace OpenGLRendering {
 
-	
-
 	ApplicationHandler* ApplicationHandler::s_Instance = nullptr;
 
 	ApplicationHandler::ApplicationHandler()
@@ -29,7 +27,7 @@ namespace OpenGLRendering {
 		m_Window->SetEventCallback(BIND_EVENT_FN(ApplicationHandler::OnEvent));
 		m_Window->SetVsync(true);
 
-		m_ImGuiLayer = std::make_unique<ImGuiLayer>();
+		m_ImGuiLayer = CreateScope<ImGuiLayer>();
 
 		RendererAPI::Init();
 	}
@@ -97,12 +95,12 @@ namespace OpenGLRendering {
 			6, 7, 3
 		};
 
-		m_Shader = std::make_unique<Shader>("src/Resources/ShaderSource/vertex.glsl", "src/Resources/ShaderSource/fragment.glsl");
+		m_Shader = CreateScope<Shader>("src/Resources/ShaderSource/vertex.glsl", "src/Resources/ShaderSource/fragment.glsl");
 		m_Shader->Bind();
 
-		m_Model = std::make_unique<Model>("src/Resources/Assets/Sniper_Rifle_Textured.fbx");
+		m_Model = CreateScope<Model>("src/Resources/Assets/Sniper_Rifle_Textured.fbx");
 
-		m_CameraController = std::make_unique<CameraController>(glm::vec3(0.0f, 0.0f, 2.0f));
+		m_CameraController = CreateScope<CameraController>(glm::vec3(0.0f, 0.0f, 2.0f));
 
 		//glfwSetInputMode(m_Window->GetNativeWindow(), GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
@@ -127,7 +125,6 @@ namespace OpenGLRendering {
 
 		glm::mat4 model = glm::translate(glm::mat4(1.0f), glm::vec3(0.0, 0.0, -4.0));
 		model = glm::rotate(model, glm::radians(-90.0f), { 1.0f, 0.0f, 0.0f });
-		//model = glm::scale(model, { 0.01, 0.01, 0.01 });
 
 		glm::mat4 view = m_CameraController->GetCamera().GetViewMatrix();
 		glm::mat4 projection = glm::perspective(45.0f, 1.0f * m_Window->GetWidth() / m_Window->GetHeight(), 0.1f, 100.0f);
@@ -138,7 +135,6 @@ namespace OpenGLRendering {
 		m_Shader->SetFloat3("u_LightPos", { cos(glm::radians(time) * 10.0f) * 10.0f ,  0.0f, sin(glm::radians(time) * 10.0f) * 10.0f });
 		m_Shader->SetFloat3("u_ViewPos", m_CameraController->GetCamera().GetPosition());
 
-		//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 		m_Model->Render(*m_Shader.get());
 	}
 

@@ -5,9 +5,9 @@
 
 namespace OpenGLRendering {
 
-	Mesh::Mesh(const std::vector<Vertex>& vertices, const std::vector<uint32_t>& indices, const std::vector<Ref<Texture2D>>& textures)
+	Mesh::Mesh(const std::vector<Vertex>& vertices, const std::vector<uint32_t>& indices, const Ref<Material>& material)
 	{
-		Init(vertices, indices, textures);
+		Init(vertices, indices, material);
 	}
 
 	Mesh::~Mesh()
@@ -15,11 +15,11 @@ namespace OpenGLRendering {
 
 	}
 
-	void Mesh::Init(const std::vector<Vertex>& vertices, const std::vector<uint32_t>& indices, const std::vector<Ref<Texture2D>>& textures)
+	void Mesh::Init(const std::vector<Vertex>& vertices, const std::vector<uint32_t>& indices, const Ref<Material>& material)
 	{
-		m_Textures = textures;
+		m_Material = material;
 
-		m_VertexArray = std::make_shared<VertexArray>();
+		m_VertexArray = CreateRef<VertexArray>();
 
 		std::shared_ptr<VertexBuffer> vertexBuffer = std::make_shared<VertexBuffer>((float*)&(vertices[0]), vertices.size() * sizeof(Vertex));
 		vertexBuffer->SetLayout(
@@ -42,7 +42,7 @@ namespace OpenGLRendering {
 		shader.Bind();
 		m_VertexArray->Bind();
 
-		for (const Ref<Texture2D>& texture : m_Textures)
+		for (const Ref<Texture2D>& texture : m_Material->GetTextures())
 		{
 			if (texture->GetType() == TextureType::DIFFUSE)
 			{

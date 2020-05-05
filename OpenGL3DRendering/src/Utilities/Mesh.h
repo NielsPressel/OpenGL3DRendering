@@ -5,6 +5,7 @@
 #include "Renderer/Texture.h"
 #include "Renderer/VertexArray.h"
 #include "Renderer/Shader.h"
+#include "Renderer/Material.h"
 
 #include "Core/Core.h"
 
@@ -22,16 +23,16 @@ namespace OpenGLRendering {
 	class Mesh
 	{
 	public:
-		Mesh(const std::vector<Vertex>& vertices, const std::vector<uint32_t>& indices, const std::vector<Ref<Texture2D>>& textures);
+		Mesh(const std::vector<Vertex>& vertices, const std::vector<uint32_t>& indices, const Ref<Material>& material);
 		~Mesh();
 
 		void Render(Shader& shader) const;
 
 	private:
-		void Init(const std::vector<Vertex>& vertices, const std::vector<uint32_t>& indices, const std::vector<Ref<Texture2D>>& textures);
+		void Init(const std::vector<Vertex>& vertices, const std::vector<uint32_t>& indices, const Ref<Material>& material);
 	private:
-		std::shared_ptr<VertexArray> m_VertexArray;
-		std::vector<Ref<Texture2D>> m_Textures;
+		Ref<VertexArray> m_VertexArray;
+		Ref<Material> m_Material;
 	};
 
 }

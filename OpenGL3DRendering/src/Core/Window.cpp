@@ -37,7 +37,7 @@ namespace OpenGLRendering {
 		m_Handle = glfwCreateWindow((int)settings.Width, (int)settings.Height, settings.Title.c_str(), nullptr, nullptr);
 		s_WindowCount++;
 
-		m_Context = std::make_unique<OpenGLContext>(m_Handle);
+		m_Context = CreateScope<OpenGLContext>(m_Handle);
 		m_Context->Init();
 
 		glfwWindowHint(GLFW_SAMPLES, 8);

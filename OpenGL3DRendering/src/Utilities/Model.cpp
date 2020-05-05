@@ -155,7 +155,9 @@ namespace OpenGLRendering {
 		std::vector<Ref<Texture2D>> normalMaps = LoadMaterialTextures(material, aiTextureType_NORMALS, scene);
 		textures.insert(textures.end(), normalMaps.begin(), normalMaps.end());
 
-		return { vertices, indices, textures };
+		Ref<Material> mat = CreateRef<Material>(glm::vec4(1.0f, 1.0f, 1.0f, 1.0f), textures);
+
+		return { vertices, indices, mat };
 	}
 
 	std::vector<Ref<Texture2D>> Model::LoadMaterialTextures(aiMaterial* material, aiTextureType type, const aiScene* scene)
