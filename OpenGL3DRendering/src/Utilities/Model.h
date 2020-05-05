@@ -2,10 +2,10 @@
 
 #include <string>
 #include <vector>
-#include <memory>
 
 #include <assimp/scene.h>
 
+#include "Core/Core.h"
 #include "Mesh.h"
 #include "Renderer/Shader.h"
 
@@ -23,7 +23,7 @@ namespace OpenGLRendering {
 		void LoadModel(const std::string& filePath);
 		void ProcessNode(aiNode* node, const aiScene* scene);
 		Mesh ProcessMesh(aiMesh* mesh, const aiScene* scene);
-		std::vector<std::shared_ptr<Texture2D>> LoadMaterialTextures(aiMaterial* mat, aiTextureType type, const aiScene* scene);
+		std::vector<Ref<Texture2D>> LoadMaterialTextures(aiMaterial* mat, aiTextureType type, const aiScene* scene);
 
 
 	private:

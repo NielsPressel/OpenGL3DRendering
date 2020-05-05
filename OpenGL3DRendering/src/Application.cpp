@@ -1,4 +1,5 @@
-#include "Core/Log.h"
+#include "oglpch.h"
+
 #include "Core/ApplicationHandler.h"
 
 int main()

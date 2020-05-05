@@ -1,3 +1,5 @@
+#include "oglpch.h"
+
 #include "IndexBuffer.h"
 
 #include <glad/glad.h>

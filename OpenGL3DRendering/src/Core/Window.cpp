@@ -1,6 +1,6 @@
-#include "Window.h"
+#include "oglpch.h"
 
-#include "Core/Core.h"
+#include "Window.h"
 
 namespace OpenGLRendering {
 

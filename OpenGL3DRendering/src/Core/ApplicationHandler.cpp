@@ -1,7 +1,6 @@
-#include "ApplicationHandler.h"
+#include "oglpch.h"
 
-#include "Core.h"
-#include "Log.h"
+#include "ApplicationHandler.h"
 
 #include "Core/Input/Input.h"
 
@@ -62,6 +61,8 @@ namespace OpenGLRendering {
 				m_ImGuiLayer->Begin();
 				OnImGuiRender();
 				m_ImGuiLayer->End();
+
+				m_Window->OnUpdate();
 			}
 		}
 	}
@@ -99,7 +100,7 @@ namespace OpenGLRendering {
 		m_Shader = std::make_unique<Shader>("src/Resources/ShaderSource/vertex.glsl", "src/Resources/ShaderSource/fragment.glsl");
 		m_Shader->Bind();
 
-		m_Model = std::make_unique<Model>("src/Resources/Assets/cottage_fbx.fbx");
+		m_Model = std::make_unique<Model>("src/Resources/Assets/Sniper_Rifle_Textured.fbx");
 
 		m_CameraController = std::make_unique<CameraController>(glm::vec3(0.0f, 0.0f, 2.0f));
 
@@ -139,14 +140,12 @@ namespace OpenGLRendering {
 
 		//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 		m_Model->Render(*m_Shader.get());
-
-		m_Window->OnUpdate();
 	}
 
 	void ApplicationHandler::OnImGuiRender()
 	{
 		ImGui::Begin("Settings");
-		ImGui::Text("Cooler Text");
+		ImGui::Text("Mein Name ist Niels Pressel");
 		ImGui::End();
 	}
 

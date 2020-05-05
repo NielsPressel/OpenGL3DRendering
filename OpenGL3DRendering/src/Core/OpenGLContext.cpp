@@ -1,8 +1,8 @@
+#include "oglpch.h"
+
 #include "OpenGLContext.h"
 
 #include <glad/glad.h>
-
-#include "Core/Core.h"
 
 namespace OpenGLRendering {
 

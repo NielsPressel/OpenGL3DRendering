@@ -1,10 +1,11 @@
-#include "Mesh.h"
+#include "oglpch.h"
 
+#include "Mesh.h"
 #include "Renderer/RendererAPI.h"
 
 namespace OpenGLRendering {
 
-	Mesh::Mesh(const std::vector<Vertex>& vertices, const std::vector<uint32_t>& indices, const std::vector<std::shared_ptr<Texture2D>>& textures)
+	Mesh::Mesh(const std::vector<Vertex>& vertices, const std::vector<uint32_t>& indices, const std::vector<Ref<Texture2D>>& textures)
 	{
 		Init(vertices, indices, textures);
 	}
@@ -14,7 +15,7 @@ namespace OpenGLRendering {
 
 	}
 
-	void Mesh::Init(const std::vector<Vertex>& vertices, const std::vector<uint32_t>& indices, const std::vector<std::shared_ptr<Texture2D>>& textures)
+	void Mesh::Init(const std::vector<Vertex>& vertices, const std::vector<uint32_t>& indices, const std::vector<Ref<Texture2D>>& textures)
 	{
 		m_Textures = textures;
 
@@ -41,7 +42,7 @@ namespace OpenGLRendering {
 		shader.Bind();
 		m_VertexArray->Bind();
 
-		for (const std::shared_ptr<Texture2D>& texture : m_Textures)
+		for (const Ref<Texture2D>& texture : m_Textures)
 		{
 			if (texture->GetType() == TextureType::DIFFUSE)
 			{

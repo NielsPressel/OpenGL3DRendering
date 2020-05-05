@@ -1,9 +1,9 @@
+#include "oglpch.h"
+
 #include "Texture.h"
 
 #include <stb_image.h>
 #include <glad/glad.h>
-
-#include "Core/Core.h"
 
 namespace OpenGLRendering {
 
@@ -108,6 +108,7 @@ namespace OpenGLRendering {
 
 	Texture2D::~Texture2D()
 	{
+		OGL_INFO("Destructing texture");
 		glDeleteTextures(1, &m_RendererID);
 	}
 

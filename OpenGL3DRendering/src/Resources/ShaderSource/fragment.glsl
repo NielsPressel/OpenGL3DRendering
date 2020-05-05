@@ -26,6 +26,6 @@ void main()
 	float spec = pow(max(dot(normal, halfwayDir), 0.0), 32.0);
 
 	vec3 specular = vec3(0.2) * spec;
-	//color = vec4(ambient + diffuse + specular, 1.0);
-	color = vec4(0.3, 0.4, 0.8, 1.0);
+	color = vec4(ambient + diffuse + specular, 1.0);
+	//color = vec4(0.3, 0.4, 0.8, 1.0);
 }

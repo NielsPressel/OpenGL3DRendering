@@ -1,3 +1,5 @@
+#include "oglpch.h"
+
 #include "CameraController.h"
 #include "Input/Input.h"
 

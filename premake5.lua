@@ -38,6 +38,9 @@ project "OpenGL3DRendering"
 
 	targetdir ("bin/" .. outputdir .. "/%{prj.name}")
 	objdir ("bin-int/" .. outputdir .. "/%{prj.name}")
+	
+	pchheader "oglpch.h"
+	pchsource "OpenGL3DRendering/src/oglpch.cpp"
 
 	files
 	{

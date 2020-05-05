@@ -1,5 +1,6 @@
-#include "Input.h"
+#include "oglpch.h"
 
+#include "Input.h"
 #include "Core/ApplicationHandler.h"
 
 #include <GLFW/glfw3.h>

@@ -1,10 +1,8 @@
+#include "oglpch.h"
+
 #include "Shader.h"
 
-#include "Core/Log.h"
-
-#include <fstream>
 #include <glad/glad.h>
-#include <vector>
 
 namespace OpenGLRendering {
 

@@ -1,6 +1,6 @@
+#include "oglpch.h"
+
 #include "Model.h"
-#include "Core/Log.h"
-#include "Core/Core.h"
 
 #include "Renderer/VertexArray.h"
 #include "Renderer/VertexBuffer.h"
@@ -102,7 +102,7 @@ namespace OpenGLRendering {
 	{
 		std::vector<Vertex> vertices;
 		std::vector<uint32_t> indices;
-		std::vector<std::shared_ptr<Texture2D>> textures;
+		std::vector<Ref<Texture2D>> textures;
 
 		vertices.reserve(mesh->mNumVertices);
 		indices.reserve((long long)mesh->mNumFaces * 3);
@@ -149,18 +149,18 @@ namespace OpenGLRendering {
 
 		aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
 
-		std::vector<std::shared_ptr<Texture2D>> diffuseMaps = LoadMaterialTextures(material, aiTextureType_DIFFUSE, scene);
+		std::vector<Ref<Texture2D>> diffuseMaps = LoadMaterialTextures(material, aiTextureType_DIFFUSE, scene);
 		textures.insert(textures.end(), diffuseMaps.begin(), diffuseMaps.end());
 
-		std::vector<std::shared_ptr<Texture2D>> normalMaps = LoadMaterialTextures(material, aiTextureType_NORMALS, scene);
+		std::vector<Ref<Texture2D>> normalMaps = LoadMaterialTextures(material, aiTextureType_NORMALS, scene);
 		textures.insert(textures.end(), normalMaps.begin(), normalMaps.end());
 
 		return { vertices, indices, textures };
 	}
 
-	std::vector<std::shared_ptr<Texture2D>> Model::LoadMaterialTextures(aiMaterial* material, aiTextureType type, const aiScene* scene)
+	std::vector<Ref<Texture2D>> Model::LoadMaterialTextures(aiMaterial* material, aiTextureType type, const aiScene* scene)
 	{
-		std::vector<std::shared_ptr<Texture2D>> textures;
+		std::vector<Ref<Texture2D>> textures;
 
 		for (unsigned int i = 0; i < material->GetTextureCount(type); i++)
 		{
@@ -173,16 +173,12 @@ namespace OpenGLRendering {
 			{
 				if (texture->mHeight == 0)
 				{
-					textures.push_back(std::make_shared<Texture2D>(texture->mWidth, (unsigned char*)texture->pcData, path, GetTypeFromAIType(type)));
+					textures.push_back(CreateRef<Texture2D>(texture->mWidth, (unsigned char*)texture->pcData, path, GetTypeFromAIType(type)));
 				}
 				else
 				{
 					//textures.push_back(std::make_shared<Texture2D>(texture->mWidth, texture->mHeight, DataFormat::ARGB, texture->pcData, path, TextureType::DIFFUSE));
 				}
-			}
-			else
-			{
-				textures.push_back(std::make_shared<Texture2D>("src/Resources/Assets/" + path, TextureType::DIFFUSE));
 			}
 		}
 

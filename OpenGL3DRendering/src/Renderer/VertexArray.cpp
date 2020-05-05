@@ -1,5 +1,6 @@
+#include "oglpch.h"
+
 #include "VertexArray.h"
-#include "Core/Core.h"
 
 #include <glad/glad.h>
 
