@@ -62,18 +62,18 @@ namespace OpenGLRendering {
 	}
 
 
-	Model::Model(const std::string& filePath) 
+	Model::Model(const std::string& filePath, bool flipUVs) 
 	{
-		LoadModel(filePath);
+		LoadModel(filePath, flipUVs);
 	}
 
 	Model::~Model() { }
 
-	void Model::LoadModel(const std::string& filePath)
+	void Model::LoadModel(const std::string& filePath, bool flipUVs)
 	{
 		Assimp::Importer importer;
 
-		const aiScene* scene = importer.ReadFile(filePath.c_str(), aiProcess_Triangulate | aiProcess_GenSmoothNormals | aiProcess_JoinIdenticalVertices | aiProcess_FlipUVs | aiProcess_CalcTangentSpace);
+		const aiScene* scene = importer.ReadFile(filePath.c_str(), flipUVs ? (aiProcess_Triangulate | aiProcess_GenSmoothNormals | aiProcess_JoinIdenticalVertices | aiProcess_CalcTangentSpace | aiProcess_FlipUVs) : (aiProcess_Triangulate | aiProcess_GenSmoothNormals | aiProcess_JoinIdenticalVertices | aiProcess_CalcTangentSpace));
 
 		if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
 		{
@@ -103,6 +103,8 @@ namespace OpenGLRendering {
 		std::vector<Vertex> vertices;
 		std::vector<uint32_t> indices;
 		std::vector<Ref<Texture2D>> textures;
+
+		std::string meshName(mesh->mName.C_Str());
 
 		vertices.reserve(mesh->mNumVertices);
 		indices.reserve((long long)mesh->mNumFaces * 3);
@@ -149,15 +151,19 @@ namespace OpenGLRendering {
 
 		aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
 
+		aiColor3D color (0.0f, 0.0f, 0.0f);
+		material->Get(AI_MATKEY_COLOR_DIFFUSE, color);
+		glm::vec4 baseColor(color.r, color.g, color.b, 1.0f);
+
 		std::vector<Ref<Texture2D>> diffuseMaps = LoadMaterialTextures(material, aiTextureType_DIFFUSE, scene);
 		textures.insert(textures.end(), diffuseMaps.begin(), diffuseMaps.end());
 
 		std::vector<Ref<Texture2D>> normalMaps = LoadMaterialTextures(material, aiTextureType_NORMALS, scene);
 		textures.insert(textures.end(), normalMaps.begin(), normalMaps.end());
 
-		Ref<Material> mat = CreateRef<Material>(glm::vec4(1.0f, 1.0f, 1.0f, 1.0f), textures);
+		Ref<Material> mat = CreateRef<Material>(baseColor, textures);
 
-		return { vertices, indices, mat };
+		return { meshName, vertices, indices, mat };
 	}
 
 	std::vector<Ref<Texture2D>> Model::LoadMaterialTextures(aiMaterial* material, aiTextureType type, const aiScene* scene)

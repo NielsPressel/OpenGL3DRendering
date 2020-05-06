@@ -5,6 +5,8 @@ layout(location = 0) out vec4 color;
 uniform sampler2D u_TextureDiffuse;
 uniform sampler2D u_TextureNormal;
 
+uniform vec4 u_Color;
+
 in vec3 v_FragPos;
 in vec2 v_TextureCoords;
 in vec3 v_TangentLightPos;
@@ -27,5 +29,5 @@ void main()
 
 	vec3 specular = vec3(0.2) * spec;
 	color = vec4(ambient + diffuse + specular, 1.0);
-	//color = vec4(0.3, 0.4, 0.8, 1.0);
+	//color = u_Color;
 }

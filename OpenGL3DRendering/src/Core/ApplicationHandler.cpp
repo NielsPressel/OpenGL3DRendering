@@ -98,7 +98,14 @@ namespace OpenGLRendering {
 		m_Shader = CreateScope<Shader>("src/Resources/ShaderSource/vertex.glsl", "src/Resources/ShaderSource/fragment.glsl");
 		m_Shader->Bind();
 
-		m_Model = CreateScope<Model>("src/Resources/Assets/Sniper_Rifle_Textured.fbx");
+		m_Model = CreateScope<Model>("src/Resources/Assets/Sniper_Rifle_Textured.fbx", true);
+
+		/*
+		Ref<Texture2D> diffuseTexture = CreateRef<Texture2D>("src/Resources/Assets/cottage_textures/cottage_diffuse.png", TextureType::DIFFUSE);
+		Ref<Texture2D> normalTexture = CreateRef<Texture2D>("src/Resources/Assets/cottage_textures/cottage_normal.png", TextureType::NORMAL);
+		m_Model->GetMeshes()[0].GetMaterial()->AddTexture(diffuseTexture);
+		m_Model->GetMeshes()[0].GetMaterial()->AddTexture(normalTexture);
+		*/
 
 		m_CameraController = CreateScope<CameraController>(glm::vec3(0.0f, 0.0f, 2.0f));
 
@@ -111,15 +118,6 @@ namespace OpenGLRendering {
 	{
 		m_CameraController->OnUpdate(t);
 		RendererAPI::Clear();
-
-		if (Input::IsMouseButtonPressed(OGL_MOUSE_BUTTON_LEFT))
-		{
-			m_Shader->SetFloat4("u_Color", { 0.2f, 0.3f, 0.8f, 1.0f });
-		}
-		else
-		{
-			m_Shader->SetFloat4("u_Color", { 0.2078f, 0.8078f, 0.902f, 1.0f });
-		}
 
 		float time = glfwGetTime();
 
@@ -140,9 +138,30 @@ namespace OpenGLRendering {
 
 	void ApplicationHandler::OnImGuiRender()
 	{
-		ImGui::Begin("Settings");
-		ImGui::Text("Mein Name ist Niels Pressel");
+#ifdef OGL_DEBUG
+		ImGui::Begin("Meshes");
+		uint32_t i = 0;
+		for (const Mesh& mesh : m_Model->GetMeshes())
+		{
+			if (ImGui::TreeNode(mesh.GetName().c_str()))
+			{
+				if (ImGui::TreeNode("Material"))
+				{
+					ImGui::ColorEdit4("Base Color", (float*)&mesh.GetMaterial()->GetBaseColor());
+
+					for (const Ref<Texture2D>& texture : mesh.GetMaterial()->GetTextures())
+					{
+						ImGui::Text(texture->GetPath().c_str());
+					}
+
+					ImGui::TreePop();
+				}
+
+				ImGui::TreePop();
+			}
+		}
 		ImGui::End();
+#endif
 	}
 
 	void ApplicationHandler::OnEvent(Event& event)

@@ -23,14 +23,19 @@ namespace OpenGLRendering {
 	class Mesh
 	{
 	public:
-		Mesh(const std::vector<Vertex>& vertices, const std::vector<uint32_t>& indices, const Ref<Material>& material);
+		Mesh(const std::string& name, const std::vector<Vertex>& vertices, const std::vector<uint32_t>& indices, const Ref<Material>& material);
 		~Mesh();
 
 		void Render(Shader& shader) const;
+		const std::string& GetName() const { return m_Name; }
+		const Ref<Material>& GetMaterial() const { return m_Material; }
+
+		Ref<Material>& GetMaterial() { return m_Material; }
 
 	private:
 		void Init(const std::vector<Vertex>& vertices, const std::vector<uint32_t>& indices, const Ref<Material>& material);
 	private:
+		std::string m_Name;
 		Ref<VertexArray> m_VertexArray;
 		Ref<Material> m_Material;
 	};

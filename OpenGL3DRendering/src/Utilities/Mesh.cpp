@@ -5,7 +5,8 @@
 
 namespace OpenGLRendering {
 
-	Mesh::Mesh(const std::vector<Vertex>& vertices, const std::vector<uint32_t>& indices, const Ref<Material>& material)
+	Mesh::Mesh(const std::string& name, const std::vector<Vertex>& vertices, const std::vector<uint32_t>& indices, const Ref<Material>& material)
+		: m_Name(name)
 	{
 		Init(vertices, indices, material);
 	}
@@ -44,6 +45,8 @@ namespace OpenGLRendering {
 
 		for (const Ref<Texture2D>& texture : m_Material->GetTextures())
 		{
+			shader.SetFloat4("u_Color", m_Material->GetBaseColor());
+
 			if (texture->GetType() == TextureType::DIFFUSE)
 			{
 				texture->Bind(0);

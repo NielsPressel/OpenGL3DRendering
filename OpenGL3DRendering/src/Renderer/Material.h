@@ -18,8 +18,10 @@ namespace OpenGLRendering {
 		void AddTexture(const Ref<Texture2D>& texture) { m_Textures.push_back(texture); }
 		void SetBaseColor(const glm::vec4& baseColor) { m_BaseColor = baseColor; }
 		
-		const std::vector<Ref<Texture2D>>& GetTextures() { return m_Textures; }
-		const glm::vec4& GetBaseColor() { return m_BaseColor; }
+		const std::vector<Ref<Texture2D>>& GetTextures() const { return m_Textures; }
+		const glm::vec4& GetBaseColor() const { return m_BaseColor; }
+
+		glm::vec4& GetBaseColor() { return m_BaseColor; }
 
 	private:
 		std::vector<Ref<Texture2D>> m_Textures;

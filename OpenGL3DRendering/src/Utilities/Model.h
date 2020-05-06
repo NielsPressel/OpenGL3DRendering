@@ -14,13 +14,14 @@ namespace OpenGLRendering {
 	class Model
 	{
 	public:
-		Model(const std::string& filePath);
+		Model(const std::string& filePath, bool flipUVs);
 		~Model();
 		
 		void Render(Shader& shader) const;
+		const std::vector<Mesh>& GetMeshes() const { return m_Meshes; }
 
 	private:
-		void LoadModel(const std::string& filePath);
+		void LoadModel(const std::string& filePath, bool flipUVs);
 		void ProcessNode(aiNode* node, const aiScene* scene);
 		Mesh ProcessMesh(aiMesh* mesh, const aiScene* scene);
 		std::vector<Ref<Texture2D>> LoadMaterialTextures(aiMaterial* mat, aiTextureType type, const aiScene* scene);
