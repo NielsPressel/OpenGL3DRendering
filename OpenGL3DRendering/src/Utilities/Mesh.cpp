@@ -5,8 +5,8 @@
 
 namespace OpenGLRendering {
 
-	Mesh::Mesh(const std::string& name, const std::vector<Vertex>& vertices, const std::vector<uint32_t>& indices, const Ref<Material>& material)
-		: m_Name(name)
+	Mesh::Mesh(const std::string& name, const std::vector<Vertex>& vertices, const std::vector<uint32_t>& indices, const Ref<Material>& material, const glm::vec3& boundingBoxCenter)
+		: m_Name(name), m_BoundingBoxCenter(boundingBoxCenter)
 	{
 		Init(vertices, indices, material);
 	}
@@ -43,20 +43,34 @@ namespace OpenGLRendering {
 		shader.Bind();
 		m_VertexArray->Bind();
 
+		shader.SetFloat4("u_Color", m_Material->GetBaseColor());
+
 		for (const Ref<Texture2D>& texture : m_Material->GetTextures())
 		{
-			shader.SetFloat4("u_Color", m_Material->GetBaseColor());
-
 			if (texture->GetType() == TextureType::DIFFUSE)
 			{
 				texture->Bind(0);
 				shader.SetInt("u_TextureDiffuse", 0);
-				break;
 			}
 			else if (texture->GetType() == TextureType::NORMAL)
 			{
 				texture->Bind(1);
 				shader.SetInt("u_TextureNormal", 1);
+			}
+			else if (texture->GetType() == TextureType::ALBEDO)
+			{
+				texture->Bind(0);
+				shader.SetInt("u_TextureAlbedo", 0);
+			}
+			else if (texture->GetType() == TextureType::METALLIC_SMOOTHNESS)
+			{
+				texture->Bind(2);
+				shader.SetInt("u_TextureMetallicSmooth", 2);
+			}
+			else if (texture->GetType() == TextureType::AMBIENT_OCCLUSION)
+			{
+				texture->Bind(3);
+				shader.SetInt("u_TextureAmbient", 3);
 			}
 		}
 

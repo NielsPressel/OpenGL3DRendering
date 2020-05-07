@@ -23,7 +23,7 @@ namespace OpenGLRendering {
 		OGL_ASSERT(!s_Instance, "Application already exists");
 		s_Instance = this;
 
-		m_Window = new Window({ "Niels Pressel" });
+		m_Window = new Window({ "OpenGL3DRendering" });
 		m_Window->SetEventCallback(BIND_EVENT_FN(ApplicationHandler::OnEvent));
 		m_Window->SetVsync(true);
 
@@ -95,23 +95,27 @@ namespace OpenGLRendering {
 			6, 7, 3
 		};
 
-		m_Shader = CreateScope<Shader>("src/Resources/ShaderSource/vertex.glsl", "src/Resources/ShaderSource/fragment.glsl");
+		m_Shader = CreateScope<Shader>("src/Resources/ShaderSource/vertex_pbr.glsl", "src/Resources/ShaderSource/fragment_pbr.glsl");
 		m_Shader->Bind();
 
-		m_Model = CreateScope<Model>("src/Resources/Assets/Sniper_Rifle_Textured.fbx", true);
+		m_Model = CreateScope<Model>("src/Resources/Assets/Pistol.fbx", false);
 
-		/*
-		Ref<Texture2D> diffuseTexture = CreateRef<Texture2D>("src/Resources/Assets/cottage_textures/cottage_diffuse.png", TextureType::DIFFUSE);
-		Ref<Texture2D> normalTexture = CreateRef<Texture2D>("src/Resources/Assets/cottage_textures/cottage_normal.png", TextureType::NORMAL);
+		Ref<Texture2D> diffuseTexture = CreateRef<Texture2D>("src/Resources/Assets/textures/Pistol_Albedo.png", TextureType::ALBEDO);
+		Ref<Texture2D> normalTexture = CreateRef<Texture2D>("src/Resources/Assets/textures/Pistol_Normal.png", TextureType::NORMAL);
+		Ref<Texture2D> metallicSmoothnessTexture = CreateRef<Texture2D>("src/Resources/Assets/textures/Pistol_MetallicSmooth.png", TextureType::METALLIC_SMOOTHNESS);
+		Ref<Texture2D> ambientOcclusionTexture = CreateRef<Texture2D>("src/Resources/Assets/textures/Pistol_Occlusion.png", TextureType::AMBIENT_OCCLUSION);
+
 		m_Model->GetMeshes()[0].GetMaterial()->AddTexture(diffuseTexture);
 		m_Model->GetMeshes()[0].GetMaterial()->AddTexture(normalTexture);
-		*/
+		m_Model->GetMeshes()[0].GetMaterial()->AddTexture(metallicSmoothnessTexture);
+		m_Model->GetMeshes()[0].GetMaterial()->AddTexture(ambientOcclusionTexture);
 
 		m_CameraController = CreateScope<CameraController>(glm::vec3(0.0f, 0.0f, 2.0f));
+		m_CameraController->LookAtPoint(m_Model->GetMeshes()[0].GetBoundingBoxCenter());
 
 		//glfwSetInputMode(m_Window->GetNativeWindow(), GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
-		RendererAPI::SetClearColor({ 0.0f, 0.0f, 0.0f, 1.0f });
+		RendererAPI::SetClearColor({ 0.5f, 0.5f, 0.5f, 1.0f });
 	}
 
 	void ApplicationHandler::OnUpdate(Timestep t)
@@ -121,8 +125,9 @@ namespace OpenGLRendering {
 
 		float time = glfwGetTime();
 
-		glm::mat4 model = glm::translate(glm::mat4(1.0f), glm::vec3(0.0, 0.0, -4.0));
-		model = glm::rotate(model, glm::radians(-90.0f), { 1.0f, 0.0f, 0.0f });
+		glm::mat4 model = glm::translate(glm::mat4(1.0f), glm::vec3(0.0, 0.0, 0.0));
+		model = glm::scale(model, glm::vec3(0.5, 0.5, 0.5));
+		//model = glm::rotate(model, glm::radians(time * 10.0f), { 1.0f, 0.5f, 0.2f });
 
 		glm::mat4 view = m_CameraController->GetCamera().GetViewMatrix();
 		glm::mat4 projection = glm::perspective(45.0f, 1.0f * m_Window->GetWidth() / m_Window->GetHeight(), 0.1f, 100.0f);
@@ -130,8 +135,9 @@ namespace OpenGLRendering {
 		m_Shader->SetMat4("u_Model", model);
 		m_Shader->SetMat4("u_View", view);
 		m_Shader->SetMat4("u_Projection", projection);
-		m_Shader->SetFloat3("u_LightPos", { cos(glm::radians(time) * 10.0f) * 10.0f ,  0.0f, sin(glm::radians(time) * 10.0f) * 10.0f });
-		m_Shader->SetFloat3("u_ViewPos", m_CameraController->GetCamera().GetPosition());
+		m_Shader->SetFloat3("u_LightPos", m_LightPos);
+		m_Shader->SetFloat3("u_CameraPos", m_CameraController->GetCamera().GetPosition());
+		//m_Shader->SetInt("u_UseTexture", 0);
 
 		m_Model->Render(*m_Shader.get());
 	}
@@ -160,6 +166,8 @@ namespace OpenGLRendering {
 				ImGui::TreePop();
 			}
 		}
+		ImGui::DragFloat3("Camera Position", (float*)&m_CameraController->GetPosition());
+		ImGui::DragFloat3("Light Position", (float*)&m_LightPos);
 		ImGui::End();
 #endif
 	}

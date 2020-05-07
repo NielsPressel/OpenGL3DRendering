@@ -15,8 +15,11 @@ namespace OpenGLRendering {
 		void OnUpdate(Timestep t);
 		void OnEvent(Event& event);
 
+		void LookAtPoint(const glm::vec3& position);
+
 		Camera& GetCamera() { return m_Camera; }
 		const Camera& GetCamera() const { return m_Camera; }
+		glm::vec3& GetPosition() { return m_CameraPosition; }
 
 	private:
 		bool OnMouseMoved(MouseMovedEvent& event);

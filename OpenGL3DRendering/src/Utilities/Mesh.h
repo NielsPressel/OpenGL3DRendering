@@ -23,12 +23,13 @@ namespace OpenGLRendering {
 	class Mesh
 	{
 	public:
-		Mesh(const std::string& name, const std::vector<Vertex>& vertices, const std::vector<uint32_t>& indices, const Ref<Material>& material);
+		Mesh(const std::string& name, const std::vector<Vertex>& vertices, const std::vector<uint32_t>& indices, const Ref<Material>& material, const glm::vec3& boundingBoxCenter);
 		~Mesh();
 
 		void Render(Shader& shader) const;
 		const std::string& GetName() const { return m_Name; }
 		const Ref<Material>& GetMaterial() const { return m_Material; }
+		const glm::vec3& GetBoundingBoxCenter() const { return m_BoundingBoxCenter; }
 
 		Ref<Material>& GetMaterial() { return m_Material; }
 
@@ -38,6 +39,7 @@ namespace OpenGLRendering {
 		std::string m_Name;
 		Ref<VertexArray> m_VertexArray;
 		Ref<Material> m_Material;
+		glm::vec3 m_BoundingBoxCenter;
 	};
 
 }

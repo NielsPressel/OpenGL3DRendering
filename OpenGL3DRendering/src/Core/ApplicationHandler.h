@@ -43,6 +43,7 @@ namespace OpenGLRendering {
 		Scope<CameraController> m_CameraController;
 		Scope<Shader> m_Shader;
 		Scope<Model> m_Model;
+		glm::vec3 m_LightPos = { 0.0f, 0.0f, 4.0f };
 	};
 
 }

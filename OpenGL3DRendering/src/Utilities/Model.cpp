@@ -104,6 +104,8 @@ namespace OpenGLRendering {
 		std::vector<uint32_t> indices;
 		std::vector<Ref<Texture2D>> textures;
 
+		float xMin = 0.0f, xMax = 0.0f, yMin = 0.0f, yMax = 0.0f, zMin = 0.0f, zMax = 0.0f;
+
 		std::string meshName(mesh->mName.C_Str());
 
 		vertices.reserve(mesh->mNumVertices);
@@ -112,6 +114,32 @@ namespace OpenGLRendering {
 		for (unsigned int i = 0; i < mesh->mNumVertices; i++)
 		{
 			Vertex vertex;
+
+			if (mesh->mVertices[i].x > xMax)
+			{
+				xMax = mesh->mVertices[i].x;
+			}
+			if (mesh->mVertices[i].x < xMin)
+			{
+				xMin = mesh->mVertices[i].x;
+			}
+			if (mesh->mVertices[i].y > yMax)
+			{
+				yMax = mesh->mVertices[i].y;
+			}
+			if (mesh->mVertices[i].y < yMin)
+			{
+				yMin = mesh->mVertices[i].y;
+			}
+			if (mesh->mVertices[i].z > zMax)
+			{
+				zMax = mesh->mVertices[i].z;
+			}
+			if (mesh->mVertices[i].z < zMin)
+			{
+				zMin = mesh->mVertices[i].z;
+			}
+
 
 			vertex.Position = { mesh->mVertices[i].x, mesh->mVertices[i].y, mesh->mVertices[i].z };
 			vertex.Normal = { mesh->mNormals[i].x, mesh->mNormals[i].y, mesh->mNormals[i].z };
@@ -163,7 +191,9 @@ namespace OpenGLRendering {
 
 		Ref<Material> mat = CreateRef<Material>(baseColor, textures);
 
-		return { meshName, vertices, indices, mat };
+		glm::vec3 boundingBoxCenter = { (xMin + xMax) / 2.0f, (yMin + yMax) / 2.0f, (zMin + zMax) / 2.0f };
+
+		return { meshName, vertices, indices, mat, boundingBoxCenter };
 	}
 
 	std::vector<Ref<Texture2D>> Model::LoadMaterialTextures(aiMaterial* material, aiTextureType type, const aiScene* scene)
