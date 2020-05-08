@@ -31,6 +31,8 @@ namespace OpenGLRendering {
 		const Ref<Material>& GetMaterial() const { return m_Material; }
 		const glm::vec3& GetBoundingBoxCenter() const { return m_BoundingBoxCenter; }
 
+		bool& IsRendering() { return m_Render; }
+
 		Ref<Material>& GetMaterial() { return m_Material; }
 
 	private:
@@ -40,6 +42,7 @@ namespace OpenGLRendering {
 		Ref<VertexArray> m_VertexArray;
 		Ref<Material> m_Material;
 		glm::vec3 m_BoundingBoxCenter;
+		bool m_Render;
 	};
 
 }

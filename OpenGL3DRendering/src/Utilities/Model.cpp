@@ -231,4 +231,12 @@ namespace OpenGLRendering {
 		}
 	}
 
+	void Model::RenderLoD(Shader& shader, uint32_t level, uint32_t meshesPerLoD) const
+	{
+		for (unsigned int i = 0; i < meshesPerLoD; i++)
+		{
+			m_Meshes[level * meshesPerLoD + i].Render(shader);
+		}
+	}
+
 }

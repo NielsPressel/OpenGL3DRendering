@@ -9,16 +9,10 @@ namespace OpenGLRendering {
 		DIFFUSE = 0, ALBEDO, NORMAL, METALLIC, ROUGHNESS, AMBIENT_OCCLUSION, METALLIC_SMOOTHNESS
 	};
 
-	enum DataFormat : uint16_t
-	{
-		RGBA = 0, ARGB, RGB
-	};
-
 	class Texture2D
 	{
 	public:
 		Texture2D(const std::string& filePath, TextureType type);
-		Texture2D(uint32_t width, uint32_t height, TextureType type);
 		Texture2D(uint32_t size, unsigned char* data, const std::string& path, TextureType type);
 		~Texture2D();
 
@@ -27,7 +21,7 @@ namespace OpenGLRendering {
 		const std::string& GetPath() const { return m_Path; }
 		TextureType GetType() const { return m_Type; }
 
-		void SetData(void* data, uint32_t size, DataFormat format);
+		void SetData(void* data, uint32_t size);
 
 		void Bind(uint32_t slot = 0) const;
 

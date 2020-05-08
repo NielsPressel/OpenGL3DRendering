@@ -52,23 +52,6 @@ namespace OpenGLRendering {
 		stbi_image_free(data);
 	}
 
-	Texture2D::Texture2D(uint32_t width, uint32_t height, TextureType type)
-		: m_Type(type)
-	{
-		m_Width = width;
-		m_Height = height;
-
-		m_InternalFormat = GL_RGBA8;
-
-		glCreateTextures(GL_TEXTURE_2D, 1, &m_RendererID);
-		glTextureStorage2D(m_RendererID, 1, m_InternalFormat, m_Width, m_Height);
-
-		glTextureParameteri(m_RendererID, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-		glTextureParameteri(m_RendererID, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-		glTextureParameteri(m_RendererID, GL_TEXTURE_WRAP_S, GL_REPEAT);
-		glTextureParameteri(m_RendererID, GL_TEXTURE_WRAP_T, GL_REPEAT);
-	}
-
 	Texture2D::Texture2D(uint32_t size, unsigned char* data, const std::string& path, TextureType type)
 		: m_Path(path), m_Type(type)
 	{
@@ -112,7 +95,7 @@ namespace OpenGLRendering {
 		glDeleteTextures(1, &m_RendererID);
 	}
 
-	void Texture2D::SetData(void* data, uint32_t size, DataFormat format)
+	void Texture2D::SetData(void* data, uint32_t size)
 	{
 		uint32_t bpp = m_DataFormat == GL_RGBA ? 4 : 3;
 		OGL_ASSERT(bpp * m_Width * m_Height == size, "Data must contain entire texture");

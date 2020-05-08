@@ -4,7 +4,6 @@
 #include "Timestep.h"
 #include "Window.h"
 #include "Renderer/Shader.h"
-#include "Renderer/VertexArray.h"
 
 #include "ImGui/ImGuiLayer.h"
 
@@ -42,8 +41,10 @@ namespace OpenGLRendering {
 		Scope<ImGuiLayer> m_ImGuiLayer;
 		Scope<CameraController> m_CameraController;
 		Scope<Shader> m_Shader;
+		Scope<Shader> m_PBRShader;
 		Scope<Model> m_Model;
 		glm::vec3 m_LightPos = { 0.0f, 0.0f, 4.0f };
+		glm::vec4 m_ClearColor = { 0.0f, 0.0f, 0.0f, 0.0f };
 	};
 
 }

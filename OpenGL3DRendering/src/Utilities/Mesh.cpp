@@ -6,7 +6,7 @@
 namespace OpenGLRendering {
 
 	Mesh::Mesh(const std::string& name, const std::vector<Vertex>& vertices, const std::vector<uint32_t>& indices, const Ref<Material>& material, const glm::vec3& boundingBoxCenter)
-		: m_Name(name), m_BoundingBoxCenter(boundingBoxCenter)
+		: m_Name(name), m_BoundingBoxCenter(boundingBoxCenter), m_Render(true)
 	{
 		Init(vertices, indices, material);
 	}
@@ -40,6 +40,11 @@ namespace OpenGLRendering {
 
 	void Mesh::Render(Shader& shader) const
 	{
+		if (!m_Render)
+		{
+			return;
+		}
+
 		shader.Bind();
 		m_VertexArray->Bind();
 
