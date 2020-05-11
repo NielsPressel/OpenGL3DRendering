@@ -23,7 +23,7 @@ namespace OpenGLRendering {
 	class Mesh
 	{
 	public:
-		Mesh(const std::string& name, const std::vector<Vertex>& vertices, const std::vector<uint32_t>& indices, const Ref<Material>& material, const glm::vec3& boundingBoxCenter);
+		Mesh(const std::string& name, const std::vector<Vertex>& vertices, const std::vector<uint32_t>& indices, const Ref<Material>& material, const glm::vec3& boundingBoxCenter, uint32_t vertexCount = 0, uint32_t faceCount = 0);
 		~Mesh();
 
 		void Render(Shader& shader) const;
@@ -32,6 +32,9 @@ namespace OpenGLRendering {
 		const glm::vec3& GetBoundingBoxCenter() const { return m_BoundingBoxCenter; }
 
 		bool& IsRendering() { return m_Render; }
+
+		uint32_t GetVertexCount() const { return m_VertexCount; }
+		uint32_t GetFaceCount() const { return m_FaceCount; }
 
 		Ref<Material>& GetMaterial() { return m_Material; }
 
@@ -43,6 +46,9 @@ namespace OpenGLRendering {
 		Ref<Material> m_Material;
 		glm::vec3 m_BoundingBoxCenter;
 		bool m_Render;
+
+		uint32_t m_VertexCount;
+		uint32_t m_FaceCount;
 	};
 
 }

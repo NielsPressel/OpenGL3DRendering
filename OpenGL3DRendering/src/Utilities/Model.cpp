@@ -7,6 +7,8 @@
 #include "Renderer/IndexBuffer.h"
 
 #include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtx/euler_angles.hpp>
 
 #include <assimp/Importer.hpp>
 #include <assimp/postprocess.h>
@@ -193,7 +195,7 @@ namespace OpenGLRendering {
 
 		glm::vec3 boundingBoxCenter = { (xMin + xMax) / 2.0f, (yMin + yMax) / 2.0f, (zMin + zMax) / 2.0f };
 
-		return { meshName, vertices, indices, mat, boundingBoxCenter };
+		return { meshName, vertices, indices, mat, boundingBoxCenter, (uint32_t)vertices.size(), (uint32_t)(indices.size() / 3) };
 	}
 
 	std::vector<Ref<Texture2D>> Model::LoadMaterialTextures(aiMaterial* material, aiTextureType type, const aiScene* scene)
@@ -225,6 +227,8 @@ namespace OpenGLRendering {
 
 	void Model::Render(Shader& shader) const
 	{
+		shader.SetMat4("u_Model", m_ModelMatrix);
+
 		for (const Mesh& mesh : m_Meshes)
 		{
 			mesh.Render(shader);
@@ -233,10 +237,34 @@ namespace OpenGLRendering {
 
 	void Model::RenderLoD(Shader& shader, uint32_t level, uint32_t meshesPerLoD) const
 	{
+		shader.SetMat4("u_Model", m_ModelMatrix);
+
 		for (unsigned int i = 0; i < meshesPerLoD; i++)
 		{
+			if (i >= m_Meshes.size())
+				break;
+
 			m_Meshes[level * meshesPerLoD + i].Render(shader);
 		}
+	}
+
+	void Model::RecalculateModelMatrix()
+	{
+		m_ModelMatrix = glm::mat4(1.0f);
+		
+		m_ModelMatrix = glm::translate(m_ModelMatrix, m_Translation);
+		m_ModelMatrix = glm::rotate(m_ModelMatrix, m_Rotation.z, { 0.0f, 0.0f, 1.0f });
+		m_ModelMatrix = glm::rotate(m_ModelMatrix, m_Rotation.x, { 1.0f, 0.0f, 0.0f });
+		m_ModelMatrix = glm::rotate(m_ModelMatrix, m_Rotation.y, { 0.0f, 1.0f, 0.0f });
+		m_ModelMatrix = glm::scale(m_ModelMatrix, m_Scale);
+	}
+
+	void Model::SetRotation(const glm::vec3& rotation, bool recalculate)
+	{
+		m_Rotation = rotation;
+
+		if (recalculate)
+			RecalculateModelMatrix();
 	}
 
 }

@@ -13,7 +13,7 @@
 #include <GLFW/glfw3.h>
 #include <imgui.h>
 
-#define DROPSHIP 1
+#define PISTOL 1
 
 namespace OpenGLRendering {
 
@@ -59,7 +59,7 @@ namespace OpenGLRendering {
 				OnUpdate(step);
 
 				m_ImGuiLayer->Begin();
-				OnImGuiRender();
+				OnImGuiRender(step);
 				m_ImGuiLayer->End();
 
 				m_Window->OnUpdate();
@@ -73,9 +73,12 @@ namespace OpenGLRendering {
 		m_PBRShader = CreateScope<Shader>("src/Resources/ShaderSource/vertex_pbr.glsl", "src/Resources/ShaderSource/fragment_pbr.glsl");
 		m_PBRShader->Bind();
 
-		m_Model = CreateScope<Model>("src/Resources/Assets/Dropship.fbx", false);
-
 #if PISTOL
+		m_Model = CreateScope<Model>("src/Resources/Assets/Pistol.fbx", false);
+		m_Model->SetTranslation({ 0.0f, 0.0f, 0.0f });
+		m_Model->SetRotation({ 0.0f, 0.0f, 0.0f });
+		m_Model->SetScale({ 0.1f, 0.1f, 0.1f });
+
 		Ref<Texture2D> diffuseTexture = CreateRef<Texture2D>("src/Resources/Assets/textures/Pistol_Albedo.png", TextureType::ALBEDO);
 		Ref<Texture2D> normalTexture = CreateRef<Texture2D>("src/Resources/Assets/textures/Pistol_Normal.png", TextureType::NORMAL);
 		Ref<Texture2D> metallicSmoothnessTexture = CreateRef<Texture2D>("src/Resources/Assets/textures/Pistol_MetallicSmooth.png", TextureType::METALLIC_SMOOTHNESS);
@@ -88,6 +91,11 @@ namespace OpenGLRendering {
 #endif
 
 #if DROPSHIP
+		m_Model = CreateScope<Model>("src/Resources/Assets/Dropship.fbx", false);
+		m_Model->SetTranslation({ 0.0f, 0.0f, 0.0f });
+		m_Model->SetRotation({ 0.0f, 0.0f, 0.0f });
+		m_Model->SetScale({ 0.01f, 0.01f, 0.01f });
+
 		Ref<Texture2D> albedoTexture01 = CreateRef<Texture2D>("src/Resources/Assets/textures/Dropship_01_Albedo.png", TextureType::ALBEDO);
 		Ref<Texture2D> normalTexture01 = CreateRef<Texture2D>("src/Resources/Assets/textures/Dropship_01_Normal.png", TextureType::NORMAL);
 		Ref<Texture2D> metallicSmoothTexture01 = CreateRef<Texture2D>("src/Resources/Assets/textures/Dropship_01_MetallicSmooth.png", TextureType::METALLIC_SMOOTHNESS);
@@ -135,8 +143,8 @@ namespace OpenGLRendering {
 		m_Model->GetMeshes()[4].GetMaterial()->AddTexture(metallicSmoothTexture05);
 #endif
 
-		m_CameraController = CreateScope<CameraController>(glm::vec3(0.0f, 0.0f, 2.0f));
-		m_CameraController->LookAtPoint(m_Model->GetMeshes()[0].GetBoundingBoxCenter());
+		m_CameraController = CreateScope<CameraController>(glm::vec3(0.0f, 0.0f, 0.0f));
+		//m_CameraController->LookAtPoint(m_Model->GetMeshes()[0].GetBoundingBoxCenter());
 	}
 
 	void ApplicationHandler::OnUpdate(Timestep t)
@@ -147,25 +155,24 @@ namespace OpenGLRendering {
 
 		float time = glfwGetTime();
 
-		glm::mat4 model = glm::translate(glm::mat4(1.0f), glm::vec3(0.0, 0.0, 0.0));
-		model = glm::scale(model, glm::vec3(0.01, 0.01, 0.01));
-		//model = glm::rotate(model, glm::radians(time * 10.0f), { 1.0f, 0.5f, 0.2f });
-
 		glm::mat4 view = m_CameraController->GetCamera().GetViewMatrix();
 		glm::mat4 projection = glm::perspective(45.0f, 1.0f * m_Window->GetWidth() / m_Window->GetHeight(), 0.1f, 100.0f);
 
-		m_PBRShader->SetMat4("u_Model", model);
 		m_PBRShader->SetMat4("u_View", view);
 		m_PBRShader->SetMat4("u_Projection", projection);
 		m_PBRShader->SetFloat3("u_LightPos", m_LightPos);
 		m_PBRShader->SetFloat3("u_CameraPos", m_CameraController->GetCamera().GetPosition());
 
+		//m_Model->Render(*m_PBRShader.get());
 		m_Model->RenderLoD(*m_PBRShader.get(), 0, 5);
 	}
 
-	void ApplicationHandler::OnImGuiRender()
+	void ApplicationHandler::OnImGuiRender(Timestep t)
 	{
 		ImGui::Begin("Meshes");
+		ImGui::Text("Object");
+		ImGui::Spacing();
+
 		uint32_t i = 0;
 		for (Mesh& mesh : m_Model->GetMeshes())
 		{
@@ -174,7 +181,16 @@ namespace OpenGLRendering {
 
 			if (ImGui::TreeNode(ss.str().c_str()))
 			{
+				std::stringstream ssVertices;
+				ssVertices << "Vertices: " << mesh.GetVertexCount();
+				std::stringstream ssFaces;
+				ssFaces << "Faces: " << mesh.GetFaceCount();
+
 				ImGui::Checkbox("Render", &mesh.IsRendering());
+				ImGui::Text(ssVertices.str().c_str());
+				ImGui::Text(ssFaces.str().c_str());
+
+
 				if (ImGui::TreeNode("Material"))
 				{
 					ImGui::ColorEdit4("Base Color", (float*)&mesh.GetMaterial()->GetBaseColor());
@@ -191,9 +207,31 @@ namespace OpenGLRendering {
 			}
 			i++;
 		}
+
+
+		ImGui::Spacing();
+		ImGui::DragFloat3("Translation", (float*)&m_Model->GetTranslation());
+		ImGui::SliderAngle("Rotation X", (float*)&m_Model->GetRotation());
+		ImGui::SliderAngle("Rotation Y", (float*)&m_Model->GetRotation()[1]);
+		ImGui::SliderAngle("Rotation Z", (float*)&m_Model->GetRotation()[2]);
+		ImGui::DragFloat3("Scale", (float*)&m_Model->GetScale(), 0.005f, 0.0f);
+
+		ImGui::Dummy({ 1.0, 10.0 });
+		ImGui::Text("Global Properties");
+		ImGui::Spacing();
 		ImGui::DragFloat3("Camera Position", (float*)&m_CameraController->GetPosition());
 		ImGui::DragFloat3("Light Position", (float*)&m_LightPos);
 		ImGui::ColorEdit4("Clear Color", (float*)&m_ClearColor);
+		ImGui::End();
+
+		m_Model->RecalculateModelMatrix();
+
+		ImGui::Begin("Render Stats");
+
+		std::stringstream ss;
+		ss << "Frametime: " << t.GetMilliseconds() << ", FPS: " << 1000.0f / t.GetMilliseconds();
+		ImGui::Text(ss.str().c_str());
+
 		ImGui::End();
 	}
 
@@ -208,6 +246,9 @@ namespace OpenGLRendering {
 
 	bool ApplicationHandler::OnWindowResize(WindowResizeEvent& event)
 	{
+		if (event.GetHeight() == 0 || event.GetWidth() == 0)
+			return true;
+
 		glViewport(0, 0, event.GetWidth(), event.GetHeight());
 
 		return true;

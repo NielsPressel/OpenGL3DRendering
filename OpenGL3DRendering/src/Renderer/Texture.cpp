@@ -91,7 +91,6 @@ namespace OpenGLRendering {
 
 	Texture2D::~Texture2D()
 	{
-		OGL_INFO("Destructing texture");
 		glDeleteTextures(1, &m_RendererID);
 	}
 

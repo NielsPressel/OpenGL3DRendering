@@ -5,8 +5,8 @@
 
 namespace OpenGLRendering {
 
-	Mesh::Mesh(const std::string& name, const std::vector<Vertex>& vertices, const std::vector<uint32_t>& indices, const Ref<Material>& material, const glm::vec3& boundingBoxCenter)
-		: m_Name(name), m_BoundingBoxCenter(boundingBoxCenter), m_Render(true)
+	Mesh::Mesh(const std::string& name, const std::vector<Vertex>& vertices, const std::vector<uint32_t>& indices, const Ref<Material>& material, const glm::vec3& boundingBoxCenter, uint32_t vertexCount, uint32_t faceCount)
+		: m_Name(name), m_BoundingBoxCenter(boundingBoxCenter), m_Render(true), m_VertexCount(vertexCount), m_FaceCount(faceCount)
 	{
 		Init(vertices, indices, material);
 	}

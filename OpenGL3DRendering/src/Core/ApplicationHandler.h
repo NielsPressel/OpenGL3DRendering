@@ -27,7 +27,7 @@ namespace OpenGLRendering {
 	private:
 		void OnStartup();
 		void OnUpdate(Timestep t);
-		void OnImGuiRender();
+		void OnImGuiRender(Timestep t);
 		void OnEvent(Event& event);
 
 		bool OnWindowResize(WindowResizeEvent& e);
