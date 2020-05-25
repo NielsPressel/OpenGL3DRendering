@@ -13,19 +13,23 @@
 #include <GLFW/glfw3.h>
 #include <imgui.h>
 
+
+// Defines for which model to render
 #define PISTOL 1
+#define DROPSHIP 0
 
 namespace OpenGLRendering {
 
 	ApplicationHandler* ApplicationHandler::s_Instance = nullptr;
 
 	ApplicationHandler::ApplicationHandler()
-		: m_Running(false)
+		: m_Running(false), m_Sleeping(false)
 	{
 		OGL_ASSERT(!s_Instance, "Application already exists");
 		s_Instance = this;
 
-		m_Window = new Window({ "OpenGL3DRendering" });
+		WindowSettings settings("OpenGL3DRendering");
+		m_Window = CreateScope<Window>(settings);
 		m_Window->SetEventCallback(BIND_EVENT_FN(ApplicationHandler::OnEvent));
 		m_Window->SetVsync(true);
 
@@ -34,10 +38,7 @@ namespace OpenGLRendering {
 		RendererAPI::Init();
 	}
 
-	ApplicationHandler::~ApplicationHandler()
-	{
-		delete m_Window;
-	}
+	ApplicationHandler::~ApplicationHandler() { }
 
 	void ApplicationHandler::StartLoop()
 	{
@@ -46,13 +47,17 @@ namespace OpenGLRendering {
 			OnStartup();
 			m_ImGuiLayer->OnStart();
 			
-			float time = glfwGetTime();
+			float time = (float)glfwGetTime();
 			float lastTime = time;
 
 			m_Running = true;
 			while (m_Running)
 			{
-				float time = glfwGetTime();
+				m_Window->OnUpdate();
+				if (m_Sleeping)
+					continue;
+
+				float time = (float)glfwGetTime();
 				Timestep step = time - lastTime;
 				lastTime = time;
 
@@ -61,8 +66,6 @@ namespace OpenGLRendering {
 				m_ImGuiLayer->Begin();
 				OnImGuiRender(step);
 				m_ImGuiLayer->End();
-
-				m_Window->OnUpdate();
 			}
 		}
 	}
@@ -144,7 +147,6 @@ namespace OpenGLRendering {
 #endif
 
 		m_CameraController = CreateScope<CameraController>(glm::vec3(0.0f, 0.0f, 0.0f));
-		//m_CameraController->LookAtPoint(m_Model->GetMeshes()[0].GetBoundingBoxCenter());
 	}
 
 	void ApplicationHandler::OnUpdate(Timestep t)
@@ -153,7 +155,7 @@ namespace OpenGLRendering {
 		RendererAPI::SetClearColor(m_ClearColor);
 		RendererAPI::Clear();
 
-		float time = glfwGetTime();
+		float time = (float)glfwGetTime();
 
 		glm::mat4 view = m_CameraController->GetCamera().GetViewMatrix();
 		glm::mat4 projection = glm::perspective(45.0f, 1.0f * m_Window->GetWidth() / m_Window->GetHeight(), 0.1f, 100.0f);
@@ -163,7 +165,6 @@ namespace OpenGLRendering {
 		m_PBRShader->SetFloat3("u_LightPos", m_LightPos);
 		m_PBRShader->SetFloat3("u_CameraPos", m_CameraController->GetCamera().GetPosition());
 
-		//m_Model->Render(*m_PBRShader.get());
 		m_Model->RenderLoD(*m_PBRShader.get(), 0, 5);
 	}
 
@@ -207,14 +208,18 @@ namespace OpenGLRendering {
 			}
 			i++;
 		}
+		static glm::vec3 translation = { 1.0f, 1.0f, 1.0f };
+		static glm::vec3 rotation = { 0.0f, 0.0f, 0.0f };
+		static glm::vec3 lastRotation = rotation;
+		static glm::vec3 scale = { 1.0f, 1.0f, 1.0f };
 
 
 		ImGui::Spacing();
-		ImGui::DragFloat3("Translation", (float*)&m_Model->GetTranslation());
-		ImGui::SliderAngle("Rotation X", (float*)&m_Model->GetRotation());
-		ImGui::SliderAngle("Rotation Y", (float*)&m_Model->GetRotation()[1]);
-		ImGui::SliderAngle("Rotation Z", (float*)&m_Model->GetRotation()[2]);
-		ImGui::DragFloat3("Scale", (float*)&m_Model->GetScale(), 0.005f, 0.0f);
+		ImGui::DragFloat3("Translation", (float*)&translation);
+		ImGui::SliderAngle("Rotation X", (float*)&rotation);
+		ImGui::SliderAngle("Rotation Y", (float*)&rotation[1]);
+		ImGui::SliderAngle("Rotation Z", (float*)&rotation[2]);
+		ImGui::DragFloat3("Scale", (float*)&scale, 0.005f, 0.0f);
 
 		ImGui::Dummy({ 1.0, 10.0 });
 		ImGui::Text("Global Properties");
@@ -224,7 +229,11 @@ namespace OpenGLRendering {
 		ImGui::ColorEdit4("Clear Color", (float*)&m_ClearColor);
 		ImGui::End();
 
-		m_Model->RecalculateModelMatrix();
+		m_Model->SetTranslation(translation);
+		m_Model->SetRotation(rotation - lastRotation);
+		m_Model->SetScale(scale);
+		m_Model->CalculateModelMatrix();
+		lastRotation = rotation;
 
 		ImGui::Begin("Render Stats");
 
@@ -247,9 +256,13 @@ namespace OpenGLRendering {
 	bool ApplicationHandler::OnWindowResize(WindowResizeEvent& event)
 	{
 		if (event.GetHeight() == 0 || event.GetWidth() == 0)
+		{
+			m_Sleeping = true;
 			return true;
+		}
 
-		glViewport(0, 0, event.GetWidth(), event.GetHeight());
+		m_Sleeping = false;
+		RendererAPI::SetViewport(0, 0, event.GetWidth(), event.GetHeight());
 
 		return true;
 	}

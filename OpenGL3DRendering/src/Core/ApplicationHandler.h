@@ -11,8 +11,12 @@
 #include "Utilities/Model.h"
 #include "Core/Core.h"
 
+
 namespace OpenGLRendering {
 
+
+	// Runtime handler of the application
+	// Change the OnStartup(), OnUpdate(Timestep t) and OnImGuiRender(Timestep t) methods to change the contents of the application
 	class ApplicationHandler
 	{
 	public:
@@ -35,9 +39,10 @@ namespace OpenGLRendering {
 
 	private:
 		bool m_Running;
+		bool m_Sleeping;
 		static ApplicationHandler* s_Instance;
 		
-		Window* m_Window;
+		Scope<Window> m_Window;
 		Scope<ImGuiLayer> m_ImGuiLayer;
 		Scope<CameraController> m_CameraController;
 		Scope<Shader> m_Shader;
@@ -47,4 +52,4 @@ namespace OpenGLRendering {
 		glm::vec4 m_ClearColor = { 0.0f, 0.0f, 0.0f, 0.0f };
 	};
 
-}
+} // namespace OpenGLRendering

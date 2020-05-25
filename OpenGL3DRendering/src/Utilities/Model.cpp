@@ -8,7 +8,8 @@
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtx/euler_angles.hpp>
+#include <glm/gtc/quaternion.hpp>
+#include <glm/gtx/quaternion.hpp>
 
 #include <assimp/Importer.hpp>
 #include <assimp/postprocess.h>
@@ -64,7 +65,8 @@ namespace OpenGLRendering {
 	}
 
 
-	Model::Model(const std::string& filePath, bool flipUVs) 
+	Model::Model(const std::string& filePath, bool flipUVs)
+		: m_Orientation(0.0f, 0.0f, 0.0f, 1.0f)
 	{
 		LoadModel(filePath, flipUVs);
 	}
@@ -211,7 +213,7 @@ namespace OpenGLRendering {
 			std::string path = std::string(str.C_Str());
 			if (texture)
 			{
-				if (texture->mHeight == 0)
+				if (texture->mHeight == 0) // Texture is compressed
 				{
 					textures.push_back(CreateRef<Texture2D>(texture->mWidth, (unsigned char*)texture->pcData, path, GetTypeFromAIType(type)));
 				}
@@ -248,23 +250,33 @@ namespace OpenGLRendering {
 		}
 	}
 
-	void Model::RecalculateModelMatrix()
+	void Model::SetTranslation(const glm::vec3& translation)
 	{
-		m_ModelMatrix = glm::mat4(1.0f);
-		
-		m_ModelMatrix = glm::translate(m_ModelMatrix, m_Translation);
-		m_ModelMatrix = glm::rotate(m_ModelMatrix, m_Rotation.z, { 0.0f, 0.0f, 1.0f });
-		m_ModelMatrix = glm::rotate(m_ModelMatrix, m_Rotation.x, { 1.0f, 0.0f, 0.0f });
-		m_ModelMatrix = glm::rotate(m_ModelMatrix, m_Rotation.y, { 0.0f, 1.0f, 0.0f });
-		m_ModelMatrix = glm::scale(m_ModelMatrix, m_Scale);
+		m_Translation = translation;
 	}
 
-	void Model::SetRotation(const glm::vec3& rotation, bool recalculate)
-	{
-		m_Rotation = rotation;
 
-		if (recalculate)
-			RecalculateModelMatrix();
+	// Doesn't really set the rotation. This function increments the rotation by the specified amount in euler angles.
+	// This helps prevent singularity (gimbal lock), because the orientation of the object is stored as a quaternion that is updated with the new rotation.
+	// By this approach the orientation is only updated in small steps, which results in a valid quaternion without singularity.
+	void Model::SetRotation(const glm::vec3& rotation)
+	{
+		m_Orientation = glm::quat(rotation) * m_Orientation;
+		glm::normalize(m_Orientation); // Normalize quaternion to ensure that it's properly formatted. Errors can occur by rounding floating point numbers.
+	}
+
+	void Model::SetScale(const glm::vec3& scale)
+	{
+		m_Scale = scale;
+	}
+
+	void Model::CalculateModelMatrix()
+	{
+		glm::mat4 m_TranslationMatrix = glm::translate(glm::mat4(1.0f), m_Translation);
+		glm::mat4 m_RotationMatrix = glm::toMat4(m_Orientation); // Parse quaternion to 4x4 matrix for building the model matrix.
+		glm::mat4 m_ScaleMatrix = glm::scale(glm::mat4(1.0f), m_Scale);
+
+		m_ModelMatrix = m_TranslationMatrix * m_RotationMatrix * m_ScaleMatrix;
 	}
 
 }

@@ -11,7 +11,6 @@
 
 #include <glm/glm.hpp>
 #include <glm/gtc/quaternion.hpp>
-#include <glm/gtx/quaternion.hpp>
 
 namespace OpenGLRendering {
 
@@ -26,19 +25,11 @@ namespace OpenGLRendering {
 
 		const std::vector<Mesh>& GetMeshes() const { return m_Meshes; }
 		std::vector<Mesh>& GetMeshes() { return m_Meshes; }
-		const glm::vec3& GetTranslation() const { return m_Translation; }
-		const glm::vec3& GetRotation() const { return m_Rotation; }
-		const glm::vec3& GetScale() const { return m_Scale; }
-		const glm::mat4 GetModelMatrix() const { return m_ModelMatrix; }
 
-		glm::vec3& GetTranslation() { return m_Translation; }
-		glm::vec3& GetRotation() { return m_Rotation; }
-		glm::vec3& GetScale() { return m_Scale; }
-
-		void SetTranslation(const glm::vec3& translation, bool recalculate = true) { m_Translation = translation; if (recalculate) RecalculateModelMatrix(); }
-		void SetRotation(const glm::vec3& rotation, bool recalculate = true);
-		void SetScale(const glm::vec3& scale, bool recalculate = true) { m_Scale = scale; if (recalculate) RecalculateModelMatrix(); }
-		void RecalculateModelMatrix();
+		void SetTranslation(const glm::vec3& translation);
+		void SetRotation(const glm::vec3& rotation);
+		void SetScale(const glm::vec3& scale);
+		void CalculateModelMatrix();
 
 	private:
 		void LoadModel(const std::string& filePath, bool flipUVs);
@@ -50,11 +41,12 @@ namespace OpenGLRendering {
 
 	private:
 		std::vector<Mesh> m_Meshes;
-		glm::vec3 m_Translation;
-		glm::vec3 m_Scale;
-		glm::vec3 m_Rotation;
 
 		glm::mat4 m_ModelMatrix;
+
+		glm::quat m_Orientation;
+		glm::vec3 m_Scale;
+		glm::vec3 m_Translation;
 	};
 
 }

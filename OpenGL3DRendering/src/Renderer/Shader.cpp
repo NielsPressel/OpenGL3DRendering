@@ -193,4 +193,10 @@ namespace OpenGLRendering {
 		int32_t location = GetUniformLocation(name);
 		glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(value));
 	}
+
+	void Shader::SetQuat(const std::string& name, const glm::quat& value)
+	{
+		int32_t location = GetUniformLocation(name);
+		glUniform4f(location, value.x, value.y, value.z, value.w);
+	}
 }
