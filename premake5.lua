@@ -92,6 +92,7 @@ project "OpenGL3DRendering"
 			"ImGui",
 			"assimp-vc142-mtd.lib",
 			"IrrXMLd.lib",
+			"zlibstaticd.lib",
 			"opengl32.lib"
 		}
 
@@ -112,6 +113,7 @@ project "OpenGL3DRendering"
 			"ImGui",
 			"assimp-vc142-mt.lib",
 			"IrrXML.lib",
+			"zlibstatic.lib",
 			"opengl32.lib"
 		}
 
@@ -133,5 +135,6 @@ project "OpenGL3DRendering"
 			"ImGui",
 			"assimp-vc142-mt.lib",
 			"IrrXML.lib",
+			"zlibstatic.lib",
 			"opengl32.lib"
 		}
