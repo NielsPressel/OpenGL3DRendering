@@ -82,7 +82,7 @@ project "OpenGL3DRendering"
 
 		libdirs 
 		{ 
-			"assimp", "%{prj.name}/vendor/assimp/lib/Debug"
+			"assimp", "%{prj.name}/vendor/assimp_lib/Debug"
 		}
 
 		links
@@ -102,7 +102,7 @@ project "OpenGL3DRendering"
 
 		libdirs 
 		{ 
-			"assimp", "%{prj.name}/vendor/assimp/lib/Release"
+			"assimp", "%{prj.name}/vendor/assimp_lib/Release"
 		}
 
 		links
@@ -123,7 +123,7 @@ project "OpenGL3DRendering"
 
 		libdirs 
 		{ 
-			"assimp", "%{prj.name}/vendor/assimp/lib/Release"
+			"assimp", "%{prj.name}/vendor/assimp_lib/Release"
 		}
 
 		links
@@ -131,6 +131,7 @@ project "OpenGL3DRendering"
 			"GLFW",
 			"Glad",
 			"ImGui",
-			"assimp.lib.lib",
+			"assimp-vc142-mt.lib",
+			"IrrXML.lib",
 			"opengl32.lib"
 		}

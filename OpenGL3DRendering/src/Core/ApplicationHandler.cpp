@@ -163,6 +163,7 @@ namespace OpenGLRendering {
 		m_PBRShader->SetMat4("u_View", view);
 		m_PBRShader->SetMat4("u_Projection", projection);
 		m_PBRShader->SetFloat3("u_LightPos", m_LightPos);
+		m_PBRShader->SetFloat3("u_LightColor", m_LightColor);
 		m_PBRShader->SetFloat3("u_CameraPos", m_CameraController->GetCamera().GetPosition());
 
 		m_Model->RenderLoD(*m_PBRShader.get(), 0, 5);
@@ -226,6 +227,7 @@ namespace OpenGLRendering {
 		ImGui::Spacing();
 		ImGui::DragFloat3("Camera Position", (float*)&m_CameraController->GetPosition());
 		ImGui::DragFloat3("Light Position", (float*)&m_LightPos);
+		ImGui::ColorEdit3("Light Color", (float*)&m_LightColor);
 		ImGui::ColorEdit4("Clear Color", (float*)&m_ClearColor);
 		ImGui::End();
 

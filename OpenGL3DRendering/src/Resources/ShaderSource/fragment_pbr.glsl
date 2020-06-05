@@ -12,6 +12,7 @@ uniform sampler2D u_TextureMetallicSmooth;
 uniform sampler2D u_TextureAmbient;
 
 uniform vec3 u_LightPos;
+uniform vec3 u_LightColor;
 uniform vec3 u_CameraPos;
 
 const float PI = 3.14159265359;
@@ -91,7 +92,7 @@ void main()
 	vec3 H = normalize(V + L);
 	float distance = length(u_LightPos - v_WorldPos) / 3.0;
 	float attenuation = 1.0 / (distance * distance);
-	vec3 radiance = vec3(1.0, 1.0, 1.0) * attenuation;
+	vec3 radiance = u_LightColor * attenuation;
 
 	float NDF = DistributionGGX(N, H, roughness);
 	float G = GeometrySmith(N, V, L, roughness);
