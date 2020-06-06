@@ -76,6 +76,8 @@ namespace OpenGLRendering {
 		m_PBRShader = CreateScope<Shader>("src/Resources/ShaderSource/vertex_pbr.glsl", "src/Resources/ShaderSource/fragment_pbr.glsl");
 		m_PBRShader->Bind();
 
+		m_Framebuffer = CreateScope<Framebuffer>(glm::vec2{ 1920, 1080 });
+
 #if PISTOL
 		m_Model = CreateScope<Model>("src/Resources/Assets/Pistol.fbx", false);
 		m_Model->SetTranslation({ 0.0f, 0.0f, 0.0f });
@@ -166,11 +168,70 @@ namespace OpenGLRendering {
 		m_PBRShader->SetFloat3("u_LightColor", m_LightColor);
 		m_PBRShader->SetFloat3("u_CameraPos", m_CameraController->GetCamera().GetPosition());
 
+		m_Framebuffer->Bind();
+		const glm::vec2& frameBufferSize = m_Framebuffer->GetSize();
+		RendererAPI::SetViewport(0, 0, frameBufferSize.x, frameBufferSize.y);
+
+		RendererAPI::Clear();
 		m_Model->RenderLoD(*m_PBRShader.get(), 0, 5);
+
+		m_Framebuffer->Unbind();
+		RendererAPI::SetViewport(0, 0, m_Window->GetWidth(), m_Window->GetHeight());
 	}
 
 	void ApplicationHandler::OnImGuiRender(Timestep t)
 	{
+		static bool opt_fullscreen_persistant = true;
+		bool opt_fullscreen = opt_fullscreen_persistant;
+		static ImGuiDockNodeFlags dockspace_flags = ImGuiDockNodeFlags_None;
+		static bool showDockspace = true;
+
+		// We are using the ImGuiWindowFlags_NoDocking flag to make the parent window not dockable into,
+		// because it would be confusing to have two docking targets within each others.
+		ImGuiWindowFlags window_flags = ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoDocking;
+		if (opt_fullscreen)
+		{
+			ImGuiViewport* viewport = ImGui::GetMainViewport();
+			ImGui::SetNextWindowPos(viewport->GetWorkPos());
+			ImGui::SetNextWindowSize(viewport->GetWorkSize());
+			ImGui::SetNextWindowViewport(viewport->ID);
+			ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
+			ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
+			window_flags |= ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove;
+			window_flags |= ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNavFocus;
+		}
+
+		if (dockspace_flags & ImGuiDockNodeFlags_PassthruCentralNode)
+			window_flags |= ImGuiWindowFlags_NoBackground;
+
+		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
+		ImGui::Begin("Editor", &showDockspace, window_flags);
+		ImGui::PopStyleVar();
+
+		if (opt_fullscreen)
+			ImGui::PopStyleVar(2);
+
+		// DockSpace
+		ImGuiIO& io = ImGui::GetIO();
+		if (io.ConfigFlags & ImGuiConfigFlags_DockingEnable)
+		{
+			ImGuiID dockspace_id = ImGui::GetID("Editor Space");
+			ImGui::DockSpace(dockspace_id, ImVec2(0.0f, 0.0f), dockspace_flags);
+		}
+
+		if (ImGui::BeginMenuBar())
+		{
+			if (ImGui::BeginMenu("File"))
+			{
+				if (ImGui::MenuItem("Close")) m_Running = false;
+				ImGui::EndMenu();
+			}
+
+			ImGui::EndMenuBar();
+		}
+
+
+		// Mesh control
 		ImGui::Begin("Meshes");
 		ImGui::Text("Object");
 		ImGui::Spacing();
@@ -237,11 +298,19 @@ namespace OpenGLRendering {
 		m_Model->CalculateModelMatrix();
 		lastRotation = rotation;
 
+		// Render Stats
 		ImGui::Begin("Render Stats");
 
 		std::stringstream ss;
 		ss << "Frametime: " << t.GetMilliseconds() << ", FPS: " << 1000.0f / t.GetMilliseconds();
 		ImGui::Text(ss.str().c_str());
+
+		ImGui::End();
+
+		ImGui::Begin("Viewport", nullptr, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoNav | ImGuiWindowFlags_NoScrollWithMouse);
+		ImVec2 size = ImGui::GetWindowSize();
+		ImGui::Image((void*)m_Framebuffer->GetRenderTexture()->GetRendererID(), size);
+		ImGui::End();
 
 		ImGui::End();
 	}

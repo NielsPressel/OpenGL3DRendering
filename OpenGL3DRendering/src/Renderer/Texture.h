@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include <glm/glm.hpp>
 
 namespace OpenGLRendering {
 
@@ -14,10 +15,12 @@ namespace OpenGLRendering {
 	public:
 		Texture2D(const std::string& filePath, TextureType type);
 		Texture2D(uint32_t size, unsigned char* data, const std::string& path, TextureType type);
+		Texture2D(const glm::vec2& size, TextureType type);
 		~Texture2D();
 
 		uint32_t GetWidth() const { return m_Width; }
 		uint32_t GetHeight() const { return m_Height; }
+		uint32_t GetRendererID() const { return m_RendererID; }
 		const std::string& GetPath() const { return m_Path; }
 		TextureType GetType() const { return m_Type; }
 
