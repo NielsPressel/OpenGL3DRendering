@@ -15,7 +15,6 @@ namespace OpenGLRendering {
 	public:
 		Texture2D(const std::string& filePath, TextureType type);
 		Texture2D(uint32_t size, unsigned char* data, const std::string& path, TextureType type);
-		Texture2D(const glm::vec2& size, TextureType type);
 		~Texture2D();
 
 		uint32_t GetWidth() const { return m_Width; }

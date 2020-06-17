@@ -89,16 +89,6 @@ namespace OpenGLRendering {
 		glGenerateMipmap(GL_TEXTURE_2D);
 	}
 
-	Texture2D::Texture2D(const glm::vec2& size, TextureType type)
-		: m_Path(""), m_Width(size.x), m_Height(size.y), m_Type(type)
-	{
-		glCreateTextures(GL_TEXTURE_2D, 1, &m_RendererID);
-		glTextureStorage2D(m_RendererID, 1, GL_RGBA8, m_Width, m_Height);
-
-		glTextureParameteri(m_RendererID, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-		glTextureParameteri(m_RendererID, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	}
-
 	Texture2D::~Texture2D()
 	{
 		glDeleteTextures(1, &m_RendererID);
@@ -118,4 +108,6 @@ namespace OpenGLRendering {
 	{
 		glBindTextureUnit(slot, m_RendererID);
 	}
+
+
 }

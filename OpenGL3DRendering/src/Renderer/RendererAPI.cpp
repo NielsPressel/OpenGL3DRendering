@@ -43,6 +43,14 @@ namespace OpenGLRendering {
 		//glEnable(GL_FRAMEBUFFER_SRGB);
 	}
 
+	void RendererAPI::SetDepthTesting(bool enable)
+	{
+		if (enable)
+			glEnable(GL_DEPTH_TEST);
+		else
+			glDisable(GL_DEPTH_TEST);
+	}
+
 	void RendererAPI::SetClearColor(const glm::vec4& color)
 	{
 		glClearColor(color.r, color.g, color.b, color.a);

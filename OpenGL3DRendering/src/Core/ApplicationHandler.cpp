@@ -76,7 +76,9 @@ namespace OpenGLRendering {
 		m_PBRShader = CreateScope<Shader>("src/Resources/ShaderSource/vertex_pbr.glsl", "src/Resources/ShaderSource/fragment_pbr.glsl");
 		m_PBRShader->Bind();
 
-		m_Framebuffer = CreateScope<Framebuffer>(glm::vec2{ 1920, 1080 });
+		FramebufferSettings settings = { 1920, 1080 };
+		m_Framebuffer = CreateScope<Framebuffer>(settings);
+		m_Framebuffer->Unbind();
 
 #if PISTOL
 		m_Model = CreateScope<Model>("src/Resources/Assets/Pistol.fbx", false);
@@ -154,13 +156,14 @@ namespace OpenGLRendering {
 	void ApplicationHandler::OnUpdate(Timestep t)
 	{
 		m_CameraController->OnUpdate(t);
+		float time = (float)glfwGetTime();
+
 		RendererAPI::SetClearColor(m_ClearColor);
 		RendererAPI::Clear();
 
-		float time = (float)glfwGetTime();
-
+		m_Framebuffer->Bind();
 		glm::mat4 view = m_CameraController->GetCamera().GetViewMatrix();
-		glm::mat4 projection = glm::perspective(45.0f, 1.0f * m_Window->GetWidth() / m_Window->GetHeight(), 0.1f, 100.0f);
+		glm::mat4 projection = glm::perspective(45.0f, 1.0f * m_Framebuffer->GetSettings().Width / m_Framebuffer->GetSettings().Height, 0.1f, 100.0f);
 
 		m_PBRShader->SetMat4("u_View", view);
 		m_PBRShader->SetMat4("u_Projection", projection);
@@ -168,11 +171,9 @@ namespace OpenGLRendering {
 		m_PBRShader->SetFloat3("u_LightColor", m_LightColor);
 		m_PBRShader->SetFloat3("u_CameraPos", m_CameraController->GetCamera().GetPosition());
 
-		m_Framebuffer->Bind();
-		const glm::vec2& frameBufferSize = m_Framebuffer->GetSize();
-		RendererAPI::SetViewport(0, 0, frameBufferSize.x, frameBufferSize.y);
-
+		RendererAPI::SetClearColor(m_ClearColor);
 		RendererAPI::Clear();
+
 		m_Model->RenderLoD(*m_PBRShader.get(), 0, 5);
 
 		m_Framebuffer->Unbind();
@@ -307,10 +308,21 @@ namespace OpenGLRendering {
 
 		ImGui::End();
 
-		ImGui::Begin("Viewport", nullptr, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoNav | ImGuiWindowFlags_NoScrollWithMouse);
-		ImVec2 size = ImGui::GetWindowSize();
-		ImGui::Image((void*)m_Framebuffer->GetRenderTexture()->GetRendererID(), size);
+		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2{ 0.0f, 0.0f });
+		ImGui::Begin("Viewport");
+		
+		ImVec2 size = ImGui::GetContentRegionAvail();
+		const FramebufferSettings& framebufferSettings = m_Framebuffer->GetSettings();
+		if (framebufferSettings.Width != size.x || framebufferSettings.Height != size.y)
+		{
+			FramebufferSettings settings = { size.x, size.y };
+			m_Framebuffer->SetSettings(settings);
+			m_Framebuffer->Invalidate();
+		}
+		ImGui::Image((void*)m_Framebuffer->GetColorTextureId(), size);
+		
 		ImGui::End();
+		ImGui::PopStyleVar();
 
 		ImGui::End();
 	}

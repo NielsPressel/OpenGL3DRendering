@@ -52,7 +52,7 @@ namespace OpenGLRendering {
 		Scope<Framebuffer> m_Framebuffer;
 		glm::vec3 m_LightPos = { 0.0f, 0.0f, 4.0f };
 		glm::vec3 m_LightColor = { 1.0f, 1.0f, 1.0f };
-		glm::vec4 m_ClearColor = { 0.0f, 0.0f, 0.0f, 0.0f };
+		glm::vec4 m_ClearColor = { 0.0f, 0.0f, 0.0f, 1.0f };
 	};
 
 } // namespace OpenGLRendering
