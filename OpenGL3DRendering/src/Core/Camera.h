@@ -5,6 +5,8 @@
 
 namespace OpenGLRendering {
 
+
+	// Very basic camera class that provides the renderer with the view matrix
 	class Camera
 	{
 	public:

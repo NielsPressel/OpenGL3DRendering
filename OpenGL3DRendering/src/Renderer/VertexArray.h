@@ -7,7 +7,7 @@
 
 namespace OpenGLRendering {
 
-
+	// VertexArray wrapper class (OpenGL abstraction)
 	class VertexArray
 	{
 	public:

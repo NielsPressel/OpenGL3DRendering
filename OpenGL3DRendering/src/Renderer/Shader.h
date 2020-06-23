@@ -8,6 +8,7 @@
 
 namespace OpenGLRendering {
 
+	// Shader wrapper class (handles compilation, linking and error checking) 
 	class Shader
 	{
 	public:
@@ -17,6 +18,7 @@ namespace OpenGLRendering {
 		void Bind() const;
 		void Unbind() const;
 
+		// Uniforms
 		void SetInt(const std::string& name, int value);
 		void SetIntArray(const std::string& name, int* values, uint32_t count);
 		void SetFloat(const std::string& name, float value);

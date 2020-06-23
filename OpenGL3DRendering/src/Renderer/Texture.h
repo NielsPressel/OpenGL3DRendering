@@ -10,6 +10,7 @@ namespace OpenGLRendering {
 		DIFFUSE = 0, ALBEDO, NORMAL, METALLIC, ROUGHNESS, AMBIENT_OCCLUSION, METALLIC_SMOOTHNESS
 	};
 
+	// Texture wrapper class (supports loading from file and memory)
 	class Texture2D
 	{
 	public:

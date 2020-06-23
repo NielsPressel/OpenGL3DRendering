@@ -4,6 +4,8 @@
 #include <iostream>
 #include <sstream>
 
+// Defines all possible event types and some helper functions and macros
+
 namespace OpenGLRendering {
 
 	enum class EventType

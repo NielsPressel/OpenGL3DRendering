@@ -3,6 +3,8 @@
 #include "Texture.h"
 #include "glm/glm.hpp"
 
+// Framebuffer wrapper class (OpenGL abstraction)
+
 namespace OpenGLRendering {
 
 	struct FramebufferSettings

@@ -1,6 +1,8 @@
 #pragma once
 #include <stdint.h>
 
+// IndexBuffer wrapper class (OpenGL abstraction)
+
 namespace OpenGLRendering {
 
 	class IndexBuffer

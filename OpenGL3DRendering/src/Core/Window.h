@@ -10,6 +10,8 @@
 #include "Core/Event.h"
 #include "Core/Core.h"
 
+// Window related classes (GLFW wrapper)
+
 namespace OpenGLRendering {
 
 	struct WindowSettings

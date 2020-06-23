@@ -9,6 +9,8 @@ namespace OpenGLRendering {
 	{
 		float cameraSpeed = 2.5 * t;
 
+
+		// Movement
 		if (Input::IsKeyPressed(OGL_KEY_W))
 		{
 			m_CameraPosition += cameraSpeed * m_CameraFront;
@@ -42,6 +44,8 @@ namespace OpenGLRendering {
 			m_Yaw += 10.0 * cameraSpeed;
 		}
 
+
+		// Update underlying camera
 		glm::vec3 front;
 		front.x = cos(glm::radians(m_Yaw)) * cos(glm::radians(m_Pitch));
 		front.y = sin(glm::radians(m_Pitch));
@@ -59,7 +63,7 @@ namespace OpenGLRendering {
 		dispatcher.Dispatch<MouseMovedEvent>(BIND_EVENT_FN(CameraController::OnMouseMoved));
 	}
 
-	void CameraController::LookAtPoint(const glm::vec3& position)
+	void CameraController::LookAtPoint(const glm::vec3& position) // TODO: Fix this function (currently not working as intended)
 	{
 		m_CameraPosition = { position.x, position.y - 4.0f, position.z + 2.0f };
 		m_CameraFront = glm::normalize(m_CameraPosition - position);
@@ -71,7 +75,8 @@ namespace OpenGLRendering {
 
 	bool CameraController::OnMouseMoved(MouseMovedEvent& event)
 	{
-#if 0
+		// View direction control through mouse movement
+#if 0	// disabled in current build
 		static bool firstMouse = true;
 		static float lastX = 0;
 		static float lastY = 0;

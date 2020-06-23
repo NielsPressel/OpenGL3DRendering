@@ -4,6 +4,11 @@
 #include <spdlog/spdlog.h>
 #include <spdlog/fmt/ostr.h>
 
+// Logging helper class that wraps spdlog and defines some logging macros
+// Logging is statically accessible everywhere in the code via the precompiled header
+
+// Usage: ONLY use the macros, never use the class directly (except initialization)
+
 namespace OpenGLRendering {
 
 	class Log

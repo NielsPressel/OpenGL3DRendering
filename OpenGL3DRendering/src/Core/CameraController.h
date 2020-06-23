@@ -6,6 +6,8 @@
 
 namespace OpenGLRendering {
 
+
+	// Controller class that handles input events concerning the camera
 	class CameraController
 	{
 	public:

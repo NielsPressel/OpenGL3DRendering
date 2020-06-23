@@ -4,6 +4,8 @@
 
 namespace OpenGLRendering {
 
+
+	// GLFW OpenGLConetex wrapper class
 	class OpenGLContext
 	{
 	public:

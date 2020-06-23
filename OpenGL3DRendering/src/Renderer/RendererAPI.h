@@ -7,6 +7,7 @@
 
 namespace OpenGLRendering {
 
+	// Abstraction for simple OpenGL calls and settings
 	class RendererAPI
 	{
 	public:

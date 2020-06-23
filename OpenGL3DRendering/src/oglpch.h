@@ -1,5 +1,7 @@
 #pragma once
 
+// Precompiled header
+
 #include <memory>
 #include <functional>
 #include <algorithm>

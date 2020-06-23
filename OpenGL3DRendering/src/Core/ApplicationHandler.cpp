@@ -30,7 +30,7 @@ namespace OpenGLRendering {
 
 		WindowSettings settings("OpenGL3DRendering");
 		m_Window = CreateScope<Window>(settings);
-		m_Window->SetEventCallback(BIND_EVENT_FN(ApplicationHandler::OnEvent));
+		m_Window->SetEventCallback(BIND_EVENT_FN(ApplicationHandler::OnEvent)); // All event functions get dispatched to ApplicationHandler::OnEvent
 		m_Window->SetVsync(true);
 
 		m_ImGuiLayer = CreateScope<ImGuiLayer>();
@@ -46,10 +46,12 @@ namespace OpenGLRendering {
 		{
 			OnStartup();
 			m_ImGuiLayer->OnStart();
-			
+
 			float time = (float)glfwGetTime();
 			float lastTime = time;
 
+
+			// Runtime loop
 			m_Running = true;
 			while (m_Running)
 			{
@@ -76,10 +78,13 @@ namespace OpenGLRendering {
 		m_PBRShader = CreateScope<Shader>("src/Resources/ShaderSource/vertex_pbr.glsl", "src/Resources/ShaderSource/fragment_pbr.glsl");
 		m_PBRShader->Bind();
 
+		// Create custom framebuffer to render to texture instead of screen
 		FramebufferSettings settings = { 1920, 1080 };
 		m_Framebuffer = CreateScope<Framebuffer>(settings);
 		m_Framebuffer->Unbind();
 
+
+		// Pistol setup
 #if PISTOL
 		m_Model = CreateScope<Model>("src/Resources/Assets/Pistol.fbx", false);
 		m_Model->SetTranslation({ 0.0f, 0.0f, 0.0f });
@@ -97,6 +102,8 @@ namespace OpenGLRendering {
 		m_Model->GetMeshes()[0].GetMaterial()->AddTexture(ambientOcclusionTexture);
 #endif
 
+
+		// Dropship setup
 #if DROPSHIP
 		m_Model = CreateScope<Model>("src/Resources/Assets/Dropship.fbx", false);
 		m_Model->SetTranslation({ 0.0f, 0.0f, 0.0f });
@@ -161,10 +168,14 @@ namespace OpenGLRendering {
 		RendererAPI::SetClearColor(m_ClearColor);
 		RendererAPI::Clear();
 
+
+		// Render to custom framebuffer to render the generated texture in an ImGui Window
 		m_Framebuffer->Bind();
 		glm::mat4 view = m_CameraController->GetCamera().GetViewMatrix();
 		glm::mat4 projection = glm::perspective(45.0f, 1.0f * m_Framebuffer->GetSettings().Width / m_Framebuffer->GetSettings().Height, 0.1f, 100.0f);
 
+
+		// Set shader uniforms
 		m_PBRShader->SetMat4("u_View", view);
 		m_PBRShader->SetMat4("u_Projection", projection);
 		m_PBRShader->SetFloat3("u_LightPos", m_LightPos);
@@ -187,8 +198,6 @@ namespace OpenGLRendering {
 		static ImGuiDockNodeFlags dockspace_flags = ImGuiDockNodeFlags_None;
 		static bool showDockspace = true;
 
-		// We are using the ImGuiWindowFlags_NoDocking flag to make the parent window not dockable into,
-		// because it would be confusing to have two docking targets within each others.
 		ImGuiWindowFlags window_flags = ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoDocking;
 		if (opt_fullscreen)
 		{
@@ -308,9 +317,11 @@ namespace OpenGLRendering {
 
 		ImGui::End();
 
+
+		// Viewport (rendered scene)
 		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2{ 0.0f, 0.0f });
 		ImGui::Begin("Viewport");
-		
+
 		ImVec2 size = ImGui::GetContentRegionAvail();
 		const FramebufferSettings& framebufferSettings = m_Framebuffer->GetSettings();
 		if (framebufferSettings.Width != size.x || framebufferSettings.Height != size.y)
@@ -320,7 +331,7 @@ namespace OpenGLRendering {
 			m_Framebuffer->Invalidate();
 		}
 		ImGui::Image((void*)m_Framebuffer->GetColorTextureId(), size);
-		
+
 		ImGui::End();
 		ImGui::PopStyleVar();
 

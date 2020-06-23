@@ -4,6 +4,8 @@
 
 #include "Core/Core.h"
 
+// VertexBuffer related classes and helper functions for simple to use VertexBuffer layout defining
+
 namespace OpenGLRendering {
 
 	enum class ShaderDataType 

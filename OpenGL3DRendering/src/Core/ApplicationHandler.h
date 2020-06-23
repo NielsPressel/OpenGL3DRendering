@@ -16,7 +16,7 @@
 namespace OpenGLRendering {
 
 
-	// Runtime handler of the application
+	// Runtime handler of the application (singleton)
 	// Change the OnStartup(), OnUpdate(Timestep t) and OnImGuiRender(Timestep t) methods to change the contents of the application
 	class ApplicationHandler
 	{
