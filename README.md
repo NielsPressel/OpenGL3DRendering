@@ -14,8 +14,8 @@ Building a simple 3D-Renderer using OpenGL.
 This project is only tested on Windows 10. The only supported architecture is x86_64 (no 32-bit support).
 
 ## Build
-Building is pretty straight forward because of premake. Just generate your Visual Studio solution files. Assimp and glad are not included in the premake build files, so you have to compile these
-libraries yourself and place them into the correct spot described in the main premake file.
+Building is pretty straight forward because of premake. Just generate your Visual Studio project files. Assimp is not included in the premake build files, so you have to compile this
+library yourself and place it into the correct spot described in the main premake file.
 
 ## Current state
 * 3D-Model loading

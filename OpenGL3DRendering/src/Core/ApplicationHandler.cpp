@@ -8,6 +8,7 @@
 #include "Renderer/VertexBuffer.h"
 #include "Renderer/RendererAPI.h"
 #include "Renderer/Texture.h"
+#include "Renderer/Cubemap.h"
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
@@ -158,6 +159,7 @@ namespace OpenGLRendering {
 #endif
 
 		m_CameraController = CreateScope<CameraController>(glm::vec3(0.0f, 0.0f, 0.0f));
+		Cubemap cubemap("src/Resources/Assets/textures/cubemap/newport_loft.hdr");
 	}
 
 	void ApplicationHandler::OnUpdate(Timestep t)
