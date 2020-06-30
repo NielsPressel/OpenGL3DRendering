@@ -22,7 +22,7 @@ namespace OpenGLRendering {
 
 		m_VertexArray = CreateRef<VertexArray>();
 
-		std::shared_ptr<VertexBuffer> vertexBuffer = std::make_shared<VertexBuffer>((float*)&(vertices[0]), vertices.size() * sizeof(Vertex));
+		Ref<VertexBuffer> vertexBuffer = CreateRef<VertexBuffer>((float*)&(vertices[0]), vertices.size() * sizeof(Vertex));
 		vertexBuffer->SetLayout(
 		{
 			{ ShaderDataType::Float3, "a_Position" },
@@ -32,7 +32,7 @@ namespace OpenGLRendering {
 			{ ShaderDataType::Float3, "a_Bitangent"}
 		});
 
-		std::shared_ptr<IndexBuffer> indexBuffer = std::make_shared<IndexBuffer>(&indices[0], indices.size());
+		Ref<IndexBuffer> indexBuffer = CreateRef<IndexBuffer>(&indices[0], indices.size());
 
 		m_VertexArray->AddVertexBuffer(vertexBuffer);
 		m_VertexArray->SetIndexBuffer(indexBuffer);

@@ -1,6 +1,10 @@
 #pragma once
 
 #include <string>
+#include <memory>
+
+#include "Renderer/Shader.h"
+#include "Renderer/VertexArray.h"
 
 namespace OpenGLRendering {
 
@@ -17,6 +21,12 @@ namespace OpenGLRendering {
 
 	private:
 		uint32_t m_CubemapTextureId;
+		uint32_t m_CubemapColorAttachmentId;
+		uint32_t m_RenderbufferAttachmentId;
+		uint32_t m_FramebufferId;
+		
+		Scope<Shader> m_ConversionShader;
+		Ref<VertexArray> m_VertexArray;
 	};
 
 }

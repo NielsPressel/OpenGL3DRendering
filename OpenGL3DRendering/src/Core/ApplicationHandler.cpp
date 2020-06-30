@@ -167,12 +167,9 @@ namespace OpenGLRendering {
 		m_CameraController->OnUpdate(t);
 		float time = (float)glfwGetTime();
 
-		RendererAPI::SetClearColor(m_ClearColor);
-		RendererAPI::Clear();
-
-
 		// Render to custom framebuffer to render the generated texture in an ImGui Window
 		m_Framebuffer->Bind();
+		m_PBRShader->Bind();
 		glm::mat4 view = m_CameraController->GetCamera().GetViewMatrix();
 		glm::mat4 projection = glm::perspective(45.0f, 1.0f * m_Framebuffer->GetSettings().Width / m_Framebuffer->GetSettings().Height, 0.1f, 100.0f);
 
@@ -188,7 +185,7 @@ namespace OpenGLRendering {
 		RendererAPI::Clear();
 
 		m_Model->RenderLoD(*m_PBRShader.get(), 0, 5);
-
+		
 		m_Framebuffer->Unbind();
 		RendererAPI::SetViewport(0, 0, m_Window->GetWidth(), m_Window->GetHeight());
 	}
