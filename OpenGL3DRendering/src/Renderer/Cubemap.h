@@ -16,6 +16,8 @@ namespace OpenGLRendering {
 
 		void Render(const glm::mat4& projection, const glm::mat4& view) const;
 
+		void BindIrradianceMap(uint32_t slot);
+
 	private:
 		void Initialize(const std::string& filepath);
 

@@ -180,6 +180,9 @@ namespace OpenGLRendering {
 		m_PBRShader->SetFloat3("u_LightPos", m_LightPos);
 		m_PBRShader->SetFloat3("u_LightColor", m_LightColor);
 		m_PBRShader->SetFloat3("u_CameraPos", m_CameraController->GetCamera().GetPosition());
+		
+		m_Cubemap->BindIrradianceMap(6);
+		m_PBRShader->SetInt("u_IrradianceMap", 6);
 
 		RendererAPI::SetClearColor(m_ClearColor);
 		RendererAPI::Clear();

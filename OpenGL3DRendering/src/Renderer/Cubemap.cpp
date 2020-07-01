@@ -82,6 +82,12 @@ namespace OpenGLRendering {
 		glDepthFunc(GL_LESS);
 	}
 
+	void Cubemap::BindIrradianceMap(uint32_t slot)
+	{
+		glActiveTexture(GL_TEXTURE0 + slot);
+		glBindTexture(GL_TEXTURE_CUBE_MAP, m_IrradianceMapId);
+	}
+
 	void Cubemap::Initialize(const std::string& filepath)
 	{
 		// Load image data

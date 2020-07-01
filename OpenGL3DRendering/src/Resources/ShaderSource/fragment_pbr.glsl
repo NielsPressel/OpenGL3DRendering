@@ -11,6 +11,8 @@ uniform sampler2D u_TextureNormal;
 uniform sampler2D u_TextureMetallicSmooth;
 uniform sampler2D u_TextureAmbient;
 
+uniform samplerCube u_IrradianceMap;
+
 uniform vec3 u_LightPos;
 uniform vec3 u_LightColor;
 uniform vec3 u_CameraPos;
@@ -109,7 +111,14 @@ void main()
 	float NdotL = max(dot(N, L), 0.0);
 	Lo += (kD * albedo / PI + specular) * radiance * NdotL;
 
-	vec3 ambient = vec3(0.03) * albedo * ao;
+	kS = FresnelSchlick(max(dot(N, V), 0.0), F0);
+	kD = 1.0 - kS;
+	kD *= 1.0 - metallic;
+	vec3 irradiance = texture(u_IrradianceMap, N).rgb;
+	vec3 diffuse = irradiance * albedo;
+	vec3 ambient = (kD * diffuse) * ao;
+	
+	
 	vec3 col = ambient + Lo;
 
 	col = col / (col + vec3(1.0));
