@@ -14,19 +14,20 @@ namespace OpenGLRendering {
 		Cubemap(const std::string& filepath);
 		~Cubemap();
 
-		void Render() const;
+		void Render(const glm::mat4& projection, const glm::mat4& view) const;
 
 	private:
 		void Initialize(const std::string& filepath);
 
 	private:
 		uint32_t m_CubemapTextureId;
-		uint32_t m_CubemapColorAttachmentId;
+		uint32_t m_EnvironmentMapId;
+		uint32_t m_IrradianceMapId;
 		uint32_t m_RenderbufferAttachmentId;
 		uint32_t m_FramebufferId;
-		
-		Scope<Shader> m_ConversionShader;
+
 		Ref<VertexArray> m_VertexArray;
+		Scope<Shader> m_CubemapShader;
 	};
 
 }

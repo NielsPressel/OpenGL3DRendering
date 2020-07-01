@@ -84,6 +84,7 @@ namespace OpenGLRendering {
 		m_Framebuffer = CreateScope<Framebuffer>(settings);
 		m_Framebuffer->Unbind();
 
+		m_Cubemap = CreateScope<Cubemap>("src/Resources/Assets/textures/cubemap/newport_loft.hdr");
 
 		// Pistol setup
 #if PISTOL
@@ -159,7 +160,6 @@ namespace OpenGLRendering {
 #endif
 
 		m_CameraController = CreateScope<CameraController>(glm::vec3(0.0f, 0.0f, 0.0f));
-		Cubemap cubemap("src/Resources/Assets/textures/cubemap/newport_loft.hdr");
 	}
 
 	void ApplicationHandler::OnUpdate(Timestep t)
@@ -185,6 +185,7 @@ namespace OpenGLRendering {
 		RendererAPI::Clear();
 
 		m_Model->RenderLoD(*m_PBRShader.get(), 0, 5);
+		m_Cubemap->Render(projection, view);
 		
 		m_Framebuffer->Unbind();
 		RendererAPI::SetViewport(0, 0, m_Window->GetWidth(), m_Window->GetHeight());

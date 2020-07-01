@@ -5,6 +5,7 @@
 #include "Window.h"
 #include "Renderer/Shader.h"
 #include "Renderer/Framebuffer.h"
+#include "Renderer/Cubemap.h"
 
 #include "ImGui/ImGuiLayer.h"
 
@@ -50,6 +51,8 @@ namespace OpenGLRendering {
 		Scope<Shader> m_PBRShader;
 		Scope<Model> m_Model;
 		Scope<Framebuffer> m_Framebuffer;
+		Scope<Cubemap> m_Cubemap;
+		
 		glm::vec3 m_LightPos = { 0.0f, 0.0f, 4.0f };
 		glm::vec3 m_LightColor = { 1.0f, 1.0f, 1.0f };
 		glm::vec4 m_ClearColor = { 0.0f, 0.0f, 0.0f, 1.0f };
