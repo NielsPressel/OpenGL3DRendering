@@ -17,6 +17,8 @@ namespace OpenGLRendering {
 		void Render(const glm::mat4& projection, const glm::mat4& view) const;
 
 		void BindIrradianceMap(uint32_t slot);
+		void BindPrefilterMap(uint32_t slot);
+		void BindBrdfLutTexture(uint32_t slot);
 
 	private:
 		void Initialize(const std::string& filepath);
@@ -25,6 +27,9 @@ namespace OpenGLRendering {
 		uint32_t m_CubemapTextureId;
 		uint32_t m_EnvironmentMapId;
 		uint32_t m_IrradianceMapId;
+		uint32_t m_PrefilterMapId;
+		uint32_t m_BrdfLutTexture;
+
 		uint32_t m_RenderbufferAttachmentId;
 		uint32_t m_FramebufferId;
 

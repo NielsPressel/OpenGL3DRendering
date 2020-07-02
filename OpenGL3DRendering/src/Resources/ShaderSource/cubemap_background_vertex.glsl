@@ -10,5 +10,9 @@ out vec3 v_WorldPos;
 void main()
 {
 	v_WorldPos = a_Position;
-	gl_Position = u_Projection * u_View * vec4(a_Position, 1.0);
+
+	mat4 rotView = mat4(mat3(u_View));
+	vec4 clipPos = u_Projection * rotView * vec4(a_Position, 1.0);
+
+	gl_Position = clipPos.xyww;
 }

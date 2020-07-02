@@ -12,6 +12,8 @@ uniform sampler2D u_TextureMetallicSmooth;
 uniform sampler2D u_TextureAmbient;
 
 uniform samplerCube u_IrradianceMap;
+uniform samplerCube u_PrefilterMap;
+uniform sampler2D u_BrdfLutTexture;
 
 uniform vec3 u_LightPos;
 uniform vec3 u_LightColor;
@@ -69,6 +71,11 @@ float GeometrySmith(vec3 N, vec3 V, vec3 L, float roughness)
 	return ggx1 * ggx2;
 }
 
+vec3 FresnelSchlickRoughness(float cosTheta, vec3 F0, float roughness)
+{
+	return F0 + (max(vec3(1.0 - roughness), F0) - F0) * pow(1.0 - cosTheta, 5.0);
+}
+
 vec3 FresnelSchlick(float cosTheta, vec3 F0)
 {
 	return F0 + (1.0 - F0) * pow(1.0 - cosTheta, 5.0);
@@ -84,6 +91,7 @@ void main()
 
 	vec3 N = GetNormalFromMap();
 	vec3 V = normalize(u_CameraPos - v_WorldPos);
+	vec3 R = reflect(-V, N);
 
 	vec3 F0 = vec3(0.04);
 	F0 = mix(F0, albedo, metallic);
@@ -111,13 +119,18 @@ void main()
 	float NdotL = max(dot(N, L), 0.0);
 	Lo += (kD * albedo / PI + specular) * radiance * NdotL;
 
-	kS = FresnelSchlick(max(dot(N, V), 0.0), F0);
+	kS = FresnelSchlickRoughness(max(dot(N, V), 0.0), F0, roughness);
 	kD = 1.0 - kS;
 	kD *= 1.0 - metallic;
 	vec3 irradiance = texture(u_IrradianceMap, N).rgb;
 	vec3 diffuse = irradiance * albedo;
-	vec3 ambient = (kD * diffuse) * ao;
-	
+
+	const float MAX_REFLECTION_LOD = 4.0;
+	vec3 prefilteredColor = textureLod(u_PrefilterMap, R, roughness * MAX_REFLECTION_LOD).rgb;
+	vec2 brdf = texture(u_BrdfLutTexture, vec2(max(dot(N, V), 0.0), roughness)).rg;
+	specular = prefilteredColor * (F * brdf.x + brdf.y);
+
+	vec3 ambient = (kD * diffuse + specular) * ao;
 	
 	vec3 col = ambient + Lo;
 
