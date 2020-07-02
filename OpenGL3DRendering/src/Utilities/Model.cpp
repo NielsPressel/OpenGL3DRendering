@@ -193,7 +193,8 @@ namespace OpenGLRendering {
 		std::vector<Ref<Texture2D>> normalMaps = LoadMaterialTextures(material, aiTextureType_NORMALS, scene);
 		textures.insert(textures.end(), normalMaps.begin(), normalMaps.end());
 
-		Ref<Material> mat = CreateRef<Material>(baseColor, textures);
+		Ref<Material> mat = CreateRef<Material>(textures);
+		mat->SetAlbedo(baseColor);
 
 		glm::vec3 boundingBoxCenter = { (xMin + xMax) / 2.0f, (yMin + yMax) / 2.0f, (zMin + zMax) / 2.0f };
 

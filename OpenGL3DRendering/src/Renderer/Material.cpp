@@ -4,11 +4,11 @@
 
 namespace OpenGLRendering {
 
-	Material::Material(const glm::vec4& baseColor)
-		: m_BaseColor(baseColor) { }
+	Material::Material()
+		: m_Metallic(0.0f), m_Roughness(0.0f), m_AmbientOcclusion(0.0f) { }
 
-	Material::Material(const glm::vec4& baseColor, const std::vector<Ref<Texture2D>>& textures)
-		: m_BaseColor(baseColor), m_Textures(textures) { }
+	Material::Material(const std::vector<Ref<Texture2D>>& textures)
+		: m_Metallic(0.0f), m_Roughness(0.0f), m_AmbientOcclusion(0.0f), m_Textures(textures) { }
 
 
 }

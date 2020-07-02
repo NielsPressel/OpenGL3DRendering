@@ -25,6 +25,7 @@ namespace OpenGLRendering {
 
 		const std::vector<Mesh>& GetMeshes() const { return m_Meshes; }
 		std::vector<Mesh>& GetMeshes() { return m_Meshes; }
+		const glm::mat4& GetModelMatrix() const { return m_ModelMatrix; }
 
 		void SetTranslation(const glm::vec3& translation);
 		void SetRotation(const glm::vec3& rotation);

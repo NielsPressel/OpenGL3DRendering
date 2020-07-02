@@ -12,20 +12,30 @@ namespace OpenGLRendering {
 	class Material
 	{
 	public:
-		Material(const glm::vec4& baseColor);
-		Material(const glm::vec4& baseColor, const std::vector<Ref<Texture2D>>& textures);
+		Material();
+		Material(const std::vector<Ref<Texture2D>>& textures);
 
 		void AddTexture(const Ref<Texture2D>& texture) { m_Textures.push_back(texture); }
-		void SetBaseColor(const glm::vec4& baseColor) { m_BaseColor = baseColor; }
+		void SetAlbedo(const glm::vec3& albedo) { m_Albedo = albedo; }
+		void SetRoughness(float roughness) { m_Roughness = roughness; }
+		void SetMetallic(float metallic) { m_Metallic = metallic; }
+		void SetAmbientOcclusion(float ao) { m_AmbientOcclusion = ao; }
 		
 		const std::vector<Ref<Texture2D>>& GetTextures() const { return m_Textures; }
-		const glm::vec4& GetBaseColor() const { return m_BaseColor; }
+		const glm::vec3& GetAlbedo() const { return m_Albedo; }
 
-		glm::vec4& GetBaseColor() { return m_BaseColor; }
+		glm::vec3& GetBaseColor() { return m_Albedo; }
+		float GetRoughness() { return m_Roughness; }
+		float GetMetallic() { return m_Metallic; }
+		float GetAmbientOcclusion() { return m_AmbientOcclusion; }
 
 	private:
 		std::vector<Ref<Texture2D>> m_Textures;
-		glm::vec4 m_BaseColor;
+		
+		glm::vec3 m_Albedo;
+		float m_Roughness;
+		float m_Metallic;
+		float m_AmbientOcclusion;
 	};
 
 }

@@ -29,6 +29,7 @@ namespace OpenGLRendering {
 		void Render(Shader& shader) const;
 		const std::string& GetName() const { return m_Name; }
 		const Ref<Material>& GetMaterial() const { return m_Material; }
+		const Ref<VertexArray>& GetVertexArray() const { return m_VertexArray; }
 		const glm::vec3& GetBoundingBoxCenter() const { return m_BoundingBoxCenter; }
 
 		bool& IsRendering() { return m_Render; }

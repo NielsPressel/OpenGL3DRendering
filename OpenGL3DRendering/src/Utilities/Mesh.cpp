@@ -48,8 +48,6 @@ namespace OpenGLRendering {
 		shader.Bind();
 		m_VertexArray->Bind();
 
-		shader.SetFloat4("u_Color", m_Material->GetBaseColor());
-
 		for (const Ref<Texture2D>& texture : m_Material->GetTextures())
 		{
 			if (texture->GetType() == TextureType::DIFFUSE)
