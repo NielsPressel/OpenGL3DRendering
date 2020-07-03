@@ -25,4 +25,4 @@ library yourself and place it into the correct spot described in the main premak
 * Cubemap rendering and IBL
 
 ## Output
-![render output](https://github.com/Sarius587/OpenGL3DRendering/blob/master/Data/rendering_output.png?raw=true)
+![render output](https://github.com/Sarius587/OpenGL3DRendering/blob/master/Data/render_output.png?raw=true)
