@@ -22,3 +22,7 @@ library yourself and place it into the correct spot described in the main premak
 * 3D-Model rendering
 * PBR Materials
 * Editor space using ImGui and integrated viewport displaying the scene
+* Cubemap rendering and IBL
+
+## Output
+![render output](https://github.com/Sarius587/OpenGL3DRendering/blob/master/Data/rendering_output.png?raw=true)
