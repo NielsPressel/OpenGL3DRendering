@@ -9,6 +9,9 @@
 #include "Renderer/RendererAPI.h"
 #include "Renderer/Texture.h"
 #include "Renderer/Cubemap.h"
+#include "Renderer/Renderer.h"
+
+#include "Utilities/MeshBuilder.h"
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
@@ -75,20 +78,23 @@ namespace OpenGLRendering {
 
 	void ApplicationHandler::OnStartup()
 	{
-		m_Shader = CreateScope<Shader>("src/Resources/ShaderSource/vertex.glsl", "src/Resources/ShaderSource/fragment.glsl");
-		m_PBRShader = CreateScope<Shader>("src/Resources/ShaderSource/vertex_pbr.glsl", "src/Resources/ShaderSource/fragment_pbr.glsl");
-		m_PBRShader->Bind();
-
 		// Create custom framebuffer to render to texture instead of screen
 		FramebufferSettings settings = { 1920, 1080 };
 		m_Framebuffer = CreateScope<Framebuffer>(settings);
 		m_Framebuffer->Unbind();
 
-		m_Cubemap = CreateScope<Cubemap>("src/Resources/Assets/textures/cubemap/newport_loft.hdr");
+		Renderer::Init();
+		m_Cubemap = CreateRef<Cubemap>("src/Resources/Assets/textures/cubemap/newport_loft.hdr");
+		m_Sphere = MeshBuilder::CreateSphere();
+		m_Sphere->GetMaterial()->UseTextures(false);
+		m_Sphere->GetMaterial()->SetAlbedo({ 1.0f, 0.0f, 0.0f });
+		m_Sphere->GetMaterial()->SetRoughness(0.0f);
+		m_Sphere->GetMaterial()->SetMetallic(1.0f);
+		m_Sphere->GetMaterial()->SetAmbientOcclusion(1.0f);
 
 		// Pistol setup
 #if PISTOL
-		m_Model = CreateScope<Model>("src/Resources/Assets/Pistol.fbx", false);
+		m_Model = CreateRef<Model>("src/Resources/Assets/Pistol.fbx", false);
 		m_Model->SetTranslation({ 0.0f, 0.0f, 0.0f });
 		m_Model->SetRotation({ 0.0f, 0.0f, 0.0f });
 		m_Model->SetScale({ 0.1f, 0.1f, 0.1f });
@@ -102,12 +108,13 @@ namespace OpenGLRendering {
 		m_Model->GetMeshes()[0].GetMaterial()->AddTexture(normalTexture);
 		m_Model->GetMeshes()[0].GetMaterial()->AddTexture(metallicSmoothnessTexture);
 		m_Model->GetMeshes()[0].GetMaterial()->AddTexture(ambientOcclusionTexture);
+		m_Model->GetMeshes()[0].GetMaterial()->UseTextures(true);
 #endif
 
 
 		// Dropship setup
 #if DROPSHIP
-		m_Model = CreateScope<Model>("src/Resources/Assets/Dropship.fbx", false);
+		m_Model = CreateRef<Model>("src/Resources/Assets/Dropship.fbx", false);
 		m_Model->SetTranslation({ 0.0f, 0.0f, 0.0f });
 		m_Model->SetRotation({ 0.0f, 0.0f, 0.0f });
 		m_Model->SetScale({ 0.01f, 0.01f, 0.01f });
@@ -169,30 +176,17 @@ namespace OpenGLRendering {
 
 		// Render to custom framebuffer to render the generated texture in an ImGui Window
 		m_Framebuffer->Bind();
-		m_PBRShader->Bind();
-		glm::mat4 view = m_CameraController->GetCamera().GetViewMatrix();
-		glm::mat4 projection = glm::perspective(45.0f, 1.0f * m_Framebuffer->GetSettings().Width / m_Framebuffer->GetSettings().Height, 0.1f, 100.0f);
-
-
-		// Set shader uniforms
-		m_PBRShader->SetMat4("u_View", view);
-		m_PBRShader->SetMat4("u_Projection", projection);
-		m_PBRShader->SetFloat3("u_LightPos", m_LightPos);
-		m_PBRShader->SetFloat3("u_LightColor", m_LightColor);
-		m_PBRShader->SetFloat3("u_CameraPos", m_CameraController->GetCamera().GetPosition());
-		
-		m_Cubemap->BindIrradianceMap(6);
-		m_Cubemap->BindPrefilterMap(7);
-		m_Cubemap->BindBrdfLutTexture(8);
-		m_PBRShader->SetInt("u_IrradianceMap", 6);
-		m_PBRShader->SetInt("u_PrefilterMap", 7);
-		m_PBRShader->SetInt("u_BrdfLutTexture", 8);
+		m_CameraController->GetCamera()->SetAspectRatio((float)m_Framebuffer->GetSettings().Width / (float)m_Framebuffer->GetSettings().Height);
 
 		RendererAPI::SetClearColor(m_ClearColor);
-		RendererAPI::Clear();
 
-		m_Model->RenderLoD(*m_PBRShader.get(), 0, 5);
-		m_Cubemap->Render(projection, view);
+		glm::mat4 model = glm::translate(glm::mat4(1.0f), { 10.0f, 0.0f, 0.0f });
+
+		LightInfo lightInfo = { m_LightPos, m_LightColor };
+		Renderer::BeginScene(m_CameraController->GetCamera(), m_Cubemap, lightInfo);
+		Renderer::Submit(m_Model);
+		Renderer::Submit(m_Sphere, model);
+		Renderer::EndScene();
 		
 		m_Framebuffer->Unbind();
 		RendererAPI::SetViewport(0, 0, m_Window->GetWidth(), m_Window->GetHeight());

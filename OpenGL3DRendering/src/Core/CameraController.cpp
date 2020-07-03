@@ -52,9 +52,9 @@ namespace OpenGLRendering {
 		front.z = sin(glm::radians(m_Yaw)) * cos(glm::radians(m_Pitch));
 
 		m_CameraFront = glm::normalize(front);
-		m_Camera.SetCameraFront(m_CameraFront);
+		m_Camera->SetCameraFront(m_CameraFront);
 
-		m_Camera.SetCameraPosition(m_CameraPosition);
+		m_Camera->SetCameraPosition(m_CameraPosition);
 	}
 
 	void CameraController::OnEvent(Event& event)
@@ -68,8 +68,8 @@ namespace OpenGLRendering {
 		m_CameraPosition = { position.x, position.y - 4.0f, position.z + 2.0f };
 		m_CameraFront = glm::normalize(m_CameraPosition - position);
 
-		m_Camera.SetCameraPosition(m_CameraPosition);
-		m_Camera.SetCameraFront(m_CameraFront);
+		m_Camera->SetCameraPosition(m_CameraPosition);
+		m_Camera->SetCameraFront(m_CameraFront);
 	}
 
 

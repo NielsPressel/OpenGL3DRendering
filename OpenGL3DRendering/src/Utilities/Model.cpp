@@ -228,29 +228,6 @@ namespace OpenGLRendering {
 		return textures;
 	}
 
-	void Model::Render(Shader& shader) const
-	{
-		shader.SetMat4("u_Model", m_ModelMatrix);
-
-		for (const Mesh& mesh : m_Meshes)
-		{
-			mesh.Render(shader);
-		}
-	}
-
-	void Model::RenderLoD(Shader& shader, uint32_t level, uint32_t meshesPerLoD) const
-	{
-		shader.SetMat4("u_Model", m_ModelMatrix);
-
-		for (unsigned int i = 0; i < meshesPerLoD; i++)
-		{
-			if (i >= m_Meshes.size())
-				break;
-
-			m_Meshes[level * meshesPerLoD + i].Render(shader);
-		}
-	}
-
 	void Model::SetTranslation(const glm::vec3& translation)
 	{
 		m_Translation = translation;

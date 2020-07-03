@@ -11,6 +11,23 @@ namespace OpenGLRendering {
 		Init(vertices, indices, material);
 	}
 
+	Mesh::Mesh(const std::string& name, const std::vector<SimpleVertex>& vertices, const std::vector<uint32_t>& indices, const Ref<Material>& material, uint32_t vertexCount, uint32_t faceCount)
+		: m_Name(name), m_Render(true), m_VertexCount(vertexCount), m_FaceCount(faceCount), m_Material(material)
+	{
+		m_VertexArray = CreateRef<VertexArray>();
+		Ref<VertexBuffer> vertexBuffer = CreateRef<VertexBuffer>((float*)&(vertices[0]), vertices.size() * sizeof(SimpleVertex));
+		vertexBuffer->SetLayout(
+		{
+			{ ShaderDataType::Float3, "a_Position" },
+			{ ShaderDataType::Float3, "a_Normal" },
+		});
+
+		Ref<IndexBuffer> indexBuffer = CreateRef<IndexBuffer>(&indices[0], indices.size());
+
+		m_VertexArray->AddVertexBuffer(vertexBuffer);
+		m_VertexArray->SetIndexBuffer(indexBuffer);
+	}
+
 	Mesh::~Mesh()
 	{
 
@@ -24,60 +41,18 @@ namespace OpenGLRendering {
 
 		Ref<VertexBuffer> vertexBuffer = CreateRef<VertexBuffer>((float*)&(vertices[0]), vertices.size() * sizeof(Vertex));
 		vertexBuffer->SetLayout(
-		{
-			{ ShaderDataType::Float3, "a_Position" },
-			{ ShaderDataType::Float3, "a_Normal"},
-			{ ShaderDataType::Float2, "a_TextureCoords"},
-			{ ShaderDataType::Float3, "a_Tangent"},
-			{ ShaderDataType::Float3, "a_Bitangent"}
-		});
+			{
+				{ ShaderDataType::Float3, "a_Position" },
+				{ ShaderDataType::Float3, "a_Normal" },
+				{ ShaderDataType::Float2, "a_TextureCoords" },
+				{ ShaderDataType::Float3, "a_Tangent" },
+				{ ShaderDataType::Float3, "a_Bitangent" }
+			});
 
 		Ref<IndexBuffer> indexBuffer = CreateRef<IndexBuffer>(&indices[0], indices.size());
 
 		m_VertexArray->AddVertexBuffer(vertexBuffer);
 		m_VertexArray->SetIndexBuffer(indexBuffer);
-	}
-
-	void Mesh::Render(Shader& shader) const
-	{
-		if (!m_Render)
-		{
-			return;
-		}
-
-		shader.Bind();
-		m_VertexArray->Bind();
-
-		for (const Ref<Texture2D>& texture : m_Material->GetTextures())
-		{
-			if (texture->GetType() == TextureType::DIFFUSE)
-			{
-				texture->Bind(0);
-				shader.SetInt("u_TextureDiffuse", 0);
-			}
-			else if (texture->GetType() == TextureType::NORMAL)
-			{
-				texture->Bind(1);
-				shader.SetInt("u_TextureNormal", 1);
-			}
-			else if (texture->GetType() == TextureType::ALBEDO)
-			{
-				texture->Bind(0);
-				shader.SetInt("u_TextureAlbedo", 0);
-			}
-			else if (texture->GetType() == TextureType::METALLIC_SMOOTHNESS)
-			{
-				texture->Bind(2);
-				shader.SetInt("u_TextureMetallicSmooth", 2);
-			}
-			else if (texture->GetType() == TextureType::AMBIENT_OCCLUSION)
-			{
-				texture->Bind(3);
-				shader.SetInt("u_TextureAmbient", 3);
-			}
-		}
-
-		RendererAPI::DrawIndexed(m_VertexArray, 0);
 	}
 
 }

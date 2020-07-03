@@ -8,15 +8,22 @@
 
 namespace OpenGLRendering {
 
+	struct LightInfo
+	{
+		glm::vec3 LightPos;
+		glm::vec3 LightColor;
+	};
+
 	class Renderer {
+	public:
 
 		static void Init();
 
-		static void BeginScene(Ref<Camera> camera, Ref<Cubemap> cubemap);
+		static void BeginScene(Ref<Camera>& camera, Ref<Cubemap>& cubemap, const LightInfo& lightInfo);
 		static void EndScene();
 		
-		static void Submit(Ref<Mesh> mesh, const glm::mat4& modelMatrix = glm::identity<glm::mat4>());
-		static void Submit(Ref<Model> model, uint16_t lod = 0, uint16_t meshesPerLod = 0);
+		static void Submit(Ref<Mesh>& mesh, const glm::mat4& modelMatrix = glm::identity<glm::mat4>());
+		static void Submit(Ref<Model>& model, uint16_t lod = 0, uint16_t meshesPerLod = 0);
 
 	};
 

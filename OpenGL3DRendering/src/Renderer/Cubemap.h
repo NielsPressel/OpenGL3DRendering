@@ -14,11 +14,12 @@ namespace OpenGLRendering {
 		Cubemap(const std::string& filepath);
 		~Cubemap();
 
-		void Render(const glm::mat4& projection, const glm::mat4& view) const;
-
+		void BindEnvironmentMap(uint32_t slot);
 		void BindIrradianceMap(uint32_t slot);
 		void BindPrefilterMap(uint32_t slot);
 		void BindBrdfLutTexture(uint32_t slot);
+
+		Ref<VertexArray> GetVertexArray() { return m_VertexArray; }
 
 	private:
 		void Initialize(const std::string& filepath);
@@ -34,7 +35,6 @@ namespace OpenGLRendering {
 		uint32_t m_FramebufferId;
 
 		Ref<VertexArray> m_VertexArray;
-		Scope<Shader> m_CubemapShader;
 	};
 
 }

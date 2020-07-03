@@ -47,11 +47,11 @@ namespace OpenGLRendering {
 		Scope<Window> m_Window;
 		Scope<ImGuiLayer> m_ImGuiLayer;
 		Scope<CameraController> m_CameraController;
-		Scope<Shader> m_Shader;
-		Scope<Shader> m_PBRShader;
-		Scope<Model> m_Model;
 		Scope<Framebuffer> m_Framebuffer;
-		Scope<Cubemap> m_Cubemap;
+		
+		Ref<Model> m_Model;
+		Ref<Mesh> m_Sphere;
+		Ref<Cubemap> m_Cubemap;
 		
 		glm::vec3 m_LightPos = { 0.0f, 0.0f, 4.0f };
 		glm::vec3 m_LightColor = { 1.0f, 1.0f, 1.0f };

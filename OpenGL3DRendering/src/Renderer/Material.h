@@ -20,6 +20,7 @@ namespace OpenGLRendering {
 		void SetRoughness(float roughness) { m_Roughness = roughness; }
 		void SetMetallic(float metallic) { m_Metallic = metallic; }
 		void SetAmbientOcclusion(float ao) { m_AmbientOcclusion = ao; }
+		void UseTextures(bool use) { m_UseTextures = use; }
 		
 		const std::vector<Ref<Texture2D>>& GetTextures() const { return m_Textures; }
 		const glm::vec3& GetAlbedo() const { return m_Albedo; }
@@ -28,6 +29,7 @@ namespace OpenGLRendering {
 		float GetRoughness() { return m_Roughness; }
 		float GetMetallic() { return m_Metallic; }
 		float GetAmbientOcclusion() { return m_AmbientOcclusion; }
+		bool IsUsingTextures() { return m_UseTextures; }
 
 	private:
 		std::vector<Ref<Texture2D>> m_Textures;
@@ -36,6 +38,8 @@ namespace OpenGLRendering {
 		float m_Roughness;
 		float m_Metallic;
 		float m_AmbientOcclusion;
+
+		bool m_UseTextures;
 	};
 
 }

@@ -1,6 +1,6 @@
 #version 330 core
 
-layout(location = 0) out vec2 color;
+layout(location = 0) out vec4 color;
 
 in vec2 v_TexCoords;
 
@@ -103,5 +103,6 @@ vec2 IntegrateBRDF(float NdotV, float roughness)
 
 void main()
 {
-	color = IntegrateBRDF(v_TexCoords.x, v_TexCoords.y);
+	vec2 brdf = IntegrateBRDF(v_TexCoords.x, v_TexCoords.y);
+	color = vec4(brdf, 1.0, 1.0);
 }

@@ -19,9 +19,6 @@ namespace OpenGLRendering {
 	public:
 		Model(const std::string& filePath, bool flipUVs);
 		~Model();
-		
-		void Render(Shader& shader) const;
-		void RenderLoD(Shader& shader, uint32_t level, uint32_t meshesPerLoD) const;
 
 		const std::vector<Mesh>& GetMeshes() const { return m_Meshes; }
 		std::vector<Mesh>& GetMeshes() { return m_Meshes; }

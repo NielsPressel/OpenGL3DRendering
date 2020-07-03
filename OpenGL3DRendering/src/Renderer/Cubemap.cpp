@@ -62,22 +62,18 @@ namespace OpenGLRendering {
 	{
 		glDeleteTextures(1, &m_CubemapTextureId);
 		glDeleteTextures(1, &m_EnvironmentMapId);
+		glDeleteTextures(1, &m_IrradianceMapId);
+		glDeleteTextures(1, &m_PrefilterMapId);
+		glDeleteTextures(1, &m_BrdfLutTexture);
 
 		glDeleteRenderbuffers(1, &m_RenderbufferAttachmentId);
 		glDeleteFramebuffers(1, &m_FramebufferId);
 	}
 
-	void Cubemap::Render(const glm::mat4& projection, const glm::mat4& view) const
+	void Cubemap::BindEnvironmentMap(uint32_t slot)
 	{
-		m_CubemapShader->Bind();
-		m_CubemapShader->SetMat4("u_Projection", projection);
-		m_CubemapShader->SetMat4("u_View", view);
-
-		glActiveTexture(GL_TEXTURE0);
+		glActiveTexture(GL_TEXTURE0 + slot);
 		glBindTexture(GL_TEXTURE_CUBE_MAP, m_EnvironmentMapId);
-		m_CubemapShader->SetInt("u_EnvironmentMap", 0);
-
-		RendererAPI::DrawIndexed(m_VertexArray, 0);
 	}
 
 	void Cubemap::BindIrradianceMap(uint32_t slot)
@@ -138,7 +134,7 @@ namespace OpenGLRendering {
 		// Environment map
 		{
 			// Compile and link conversion shader
-			Shader conversionShader("src/Resources/ShaderSource/conversion_vertex.glsl", "src/Resources/ShaderSource/equirectengular_conversion_fragment.glsl");
+			Shader conversionShader("src/Resources/ShaderSource/Conversion/conversion_vertex.glsl", "src/Resources/ShaderSource/Conversion/equirectengular_conversion_fragment.glsl");
 
 			conversionShader.Bind();
 			conversionShader.SetInt("u_EquirectengularMap", 0);
@@ -187,7 +183,7 @@ namespace OpenGLRendering {
 		// Irradiance map
 		{		
 			// Compile and link irradiance conversion shader
-			Shader irradianceConversionShader("src/Resources/ShaderSource/conversion_vertex.glsl", "src/Resources/ShaderSource/irradiance_conversion_fragment.glsl");
+			Shader irradianceConversionShader("src/Resources/ShaderSource/Conversion/conversion_vertex.glsl", "src/Resources/ShaderSource/Conversion/irradiance_conversion_fragment.glsl");
 
 			// Create irradiance texture
 			glCreateTextures(GL_TEXTURE_CUBE_MAP, 1, &m_IrradianceMapId);
@@ -233,7 +229,7 @@ namespace OpenGLRendering {
 		// Prefilter map
 		{
 			// Compile and link prefilter shader
-			Shader prefilterShader("src/Resources/ShaderSource/cubemap_vertex.glsl", "src/Resources/ShaderSource/prefilter_fragment.glsl");
+			Shader prefilterShader("src/Resources/ShaderSource/Conversion/cubemap_vertex.glsl", "src/Resources/ShaderSource/Conversion/prefilter_fragment.glsl");
 
 			// Generate prefilter map
 			glCreateTextures(GL_TEXTURE_CUBE_MAP, 1, &m_PrefilterMapId);
@@ -249,7 +245,7 @@ namespace OpenGLRendering {
 			glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
 			glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 			glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-
+			
 			glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
 
 			prefilterShader.Bind();
@@ -286,7 +282,7 @@ namespace OpenGLRendering {
 
 		// BRDF LUT texture
 		{
-			Shader brdfShader("src/Resources/ShaderSource/brdf_vertex.glsl", "src/Resources/ShaderSource/brdf_fragment.glsl");
+			Shader brdfShader("src/Resources/ShaderSource/Conversion/brdf_vertex.glsl", "src/Resources/ShaderSource/Conversion/brdf_fragment.glsl");
 
 			glCreateTextures(GL_TEXTURE_2D, 1, &m_BrdfLutTexture);
 			glBindTexture(GL_TEXTURE_2D, m_BrdfLutTexture);
@@ -308,10 +304,10 @@ namespace OpenGLRendering {
 
 			float quadVertices[] =
 			{
-				-1.0f,  1.0f, 0.0f, 1.0f,
 				-1.0f, -1.0f, 0.0f, 0.0f,
 				 1.0f, -1.0f, 1.0f, 0.0f,
 				 1.0f,  1.0f, 1.0f, 1.0f,
+				-1.0f,  1.0f, 0.0f, 1.0f,
 			};
 
 			uint32_t quadIndices[] =
@@ -323,8 +319,8 @@ namespace OpenGLRendering {
 			Ref<VertexBuffer> vb = CreateRef<VertexBuffer>(quadVertices, 4 * 4 * 4);
 			vb->SetLayout(
 			{
-				{ShaderDataType::Float2, "a_Position"},
-				{ShaderDataType::Float2, "a_TexCoords"},
+				{ ShaderDataType::Float2, "a_Position" },
+				{ ShaderDataType::Float2, "a_TexCoords" },
 			});
 
 			Ref<IndexBuffer> ib = CreateRef<IndexBuffer>(quadIndices, 2 * 3);
@@ -338,8 +334,5 @@ namespace OpenGLRendering {
 
 			glBindFramebuffer(GL_FRAMEBUFFER, 0);
 		}
-
-		// Compile and link cube map shader
-		m_CubemapShader = CreateScope<Shader>("src/Resources/ShaderSource/cubemap_background_vertex.glsl", "src/Resources/ShaderSource/cubemap_background_fragment.glsl");
 	}
 }
