@@ -85,12 +85,28 @@ namespace OpenGLRendering {
 
 		Renderer::Init();
 		m_Cubemap = CreateRef<Cubemap>("src/Resources/Assets/textures/cubemap/newport_loft.hdr");
+		
 		m_Sphere = MeshBuilder::CreateSphere();
 		m_Sphere->GetMaterial()->UseTextures(false);
 		m_Sphere->GetMaterial()->SetAlbedo({ 1.0f, 0.0f, 0.0f });
-		m_Sphere->GetMaterial()->SetRoughness(0.0f);
+		m_Sphere->GetMaterial()->SetRoughness(1.0f);
 		m_Sphere->GetMaterial()->SetMetallic(1.0f);
 		m_Sphere->GetMaterial()->SetAmbientOcclusion(1.0f);
+
+		m_Cube = MeshBuilder::CreateCube();
+		m_Cube->GetMaterial()->UseTextures(false);
+		m_Cube->GetMaterial()->SetAlbedo({ 0.0f, 1.0f, 0.0f });
+		m_Cube->GetMaterial()->SetRoughness(0.0f);
+		m_Cube->GetMaterial()->SetMetallic(0.0f);
+		m_Cube->GetMaterial()->SetAmbientOcclusion(1.0f);
+
+		// TODO: Check weird reflection on pyramid
+		m_Pyramid = MeshBuilder::CreatePyramid();
+		m_Pyramid->GetMaterial()->UseTextures(false);
+		m_Pyramid->GetMaterial()->SetAlbedo({ 0.0f, 0.0f, 1.0f });
+		m_Pyramid->GetMaterial()->SetRoughness(0.0f);
+		m_Pyramid->GetMaterial()->SetMetallic(0.0f);
+		m_Pyramid->GetMaterial()->SetAmbientOcclusion(1.0f);
 
 		// Pistol setup
 #if PISTOL
@@ -180,12 +196,16 @@ namespace OpenGLRendering {
 
 		RendererAPI::SetClearColor(m_ClearColor);
 
-		glm::mat4 model = glm::translate(glm::mat4(1.0f), { 10.0f, 0.0f, 0.0f });
+		glm::mat4 modelSphere = glm::translate(glm::mat4(1.0f), { 10.0f, 0.0f, 0.0f });
+		glm::mat4 modelCube = glm::translate(glm::mat4(1.0f), { 0.0f, 5.0f, 0.0f });
+		glm::mat4 modelPyramid = glm::translate(glm::mat4(1.0f), { 0.0f, 0.0f, -5.0f });
 
 		LightInfo lightInfo = { m_LightPos, m_LightColor };
 		Renderer::BeginScene(m_CameraController->GetCamera(), m_Cubemap, lightInfo);
 		Renderer::Submit(m_Model);
-		Renderer::Submit(m_Sphere, model);
+		Renderer::Submit(m_Sphere, modelSphere);
+		Renderer::Submit(m_Cube, modelCube);
+		Renderer::Submit(m_Pyramid, modelPyramid);
 		Renderer::EndScene();
 		
 		m_Framebuffer->Unbind();
@@ -284,7 +304,7 @@ namespace OpenGLRendering {
 		static glm::vec3 translation = { 1.0f, 1.0f, 1.0f };
 		static glm::vec3 rotation = { 0.0f, 0.0f, 0.0f };
 		static glm::vec3 lastRotation = rotation;
-		static glm::vec3 scale = { 1.0f, 1.0f, 1.0f };
+		static glm::vec3 scale = { 0.1f, 0.1f, 0.1f };
 
 
 		ImGui::Spacing();

@@ -31,6 +31,7 @@ namespace OpenGLRendering {
 	public:
 		Mesh(const std::string& name, const std::vector<Vertex>& vertices, const std::vector<uint32_t>& indices, const Ref<Material>& material, const glm::vec3& boundingBoxCenter, uint32_t vertexCount = 0, uint32_t faceCount = 0);
 		Mesh(const std::string& name, const std::vector<SimpleVertex>& vertices, const std::vector<uint32_t>& indices, const Ref<Material>& material, uint32_t vertexCount = 0, uint32_t faceCoount = 0);
+		Mesh(const std::string& name, SimpleVertex* vertices, uint32_t* indices, const Ref<Material>& material, uint32_t vertexCount, uint32_t faceCount);
 		~Mesh();
 
 		const std::string& GetName() const { return m_Name; }

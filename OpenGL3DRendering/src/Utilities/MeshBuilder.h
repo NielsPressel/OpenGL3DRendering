@@ -8,6 +8,8 @@ namespace OpenGLRendering {
 	{
 	public:
 		static Ref<Mesh> CreateSphere();
+		static Ref<Mesh> CreateCube();
+		static Ref<Mesh> CreatePyramid();
 	};
 
 }

@@ -28,6 +28,23 @@ namespace OpenGLRendering {
 		m_VertexArray->SetIndexBuffer(indexBuffer);
 	}
 
+	Mesh::Mesh(const std::string& name, SimpleVertex* vertices, uint32_t* indices, const Ref<Material>& material, uint32_t vertexCount, uint32_t faceCount)
+		: m_Name(name), m_Render(true), m_VertexCount(vertexCount), m_FaceCount(faceCount), m_Material(material)
+	{
+		m_VertexArray = CreateRef<VertexArray>();
+		Ref<VertexBuffer> vertexBuffer = CreateRef<VertexBuffer>((float*)vertices, vertexCount * sizeof(SimpleVertex));
+		vertexBuffer->SetLayout(
+			{
+				{ ShaderDataType::Float3, "a_Position" },
+				{ ShaderDataType::Float3, "a_Normal" },
+			});
+
+		Ref<IndexBuffer> indexBuffer = CreateRef<IndexBuffer>(indices, faceCount * 3);
+
+		m_VertexArray->AddVertexBuffer(vertexBuffer);
+		m_VertexArray->SetIndexBuffer(indexBuffer);
+	}
+
 	Mesh::~Mesh()
 	{
 

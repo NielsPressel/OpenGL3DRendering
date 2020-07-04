@@ -51,6 +51,8 @@ namespace OpenGLRendering {
 		
 		Ref<Model> m_Model;
 		Ref<Mesh> m_Sphere;
+		Ref<Mesh> m_Cube;
+		Ref<Mesh> m_Pyramid;
 		Ref<Cubemap> m_Cubemap;
 		
 		glm::vec3 m_LightPos = { 0.0f, 0.0f, 4.0f };

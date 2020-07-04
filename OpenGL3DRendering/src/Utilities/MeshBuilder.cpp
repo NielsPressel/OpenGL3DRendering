@@ -4,6 +4,89 @@
 
 namespace OpenGLRendering {
 
+    static float s_CubeVertexBuffer[]
+    {
+        -1.0f, -1.0f, -1.0f, -1.0f,  0.0f,  0.0f, // left face
+        -1.0f, -1.0f,  1.0f, -1.0f,  0.0f,  0.0f,
+        -1.0f,  1.0f,  1.0f, -1.0f,  0.0f,  0.0f,
+        -1.0f,  1.0f, -1.0f, -1.0f,  0.0f,  0.0f,
+                                     
+        -1.0f, -1.0f,  1.0f,  0.0f,  0.0f,  1.0f, // front face
+         1.0f, -1.0f,  1.0f,  0.0f,  0.0f,  1.0f,
+         1.0f,  1.0f,  1.0f,  0.0f,  0.0f,  1.0f,
+        -1.0f,  1.0f,  1.0f,  0.0f,  0.0f,  1.0f,
+                                     
+         1.0f, -1.0f,  1.0f,  1.0f,  0.0f,  0.0f, // right face
+         1.0f, -1.0f, -1.0f,  1.0f,  0.0f,  0.0f,
+         1.0f,  1.0f, -1.0f,  1.0f,  0.0f,  0.0f,
+         1.0f,  1.0f,  1.0f,  1.0f,  0.0f,  0.0f,
+                                            
+         1.0f, -1.0f, -1.0f,  0.0f,  0.0f, -1.0f, // back face
+        -1.0f, -1.0f, -1.0f,  0.0f,  0.0f, -1.0f,
+        -1.0f,  1.0f, -1.0f,  0.0f,  0.0f, -1.0f,
+         1.0f,  1.0f, -1.0f,  0.0f,  0.0f, -1.0f,
+
+         1.0f, -1.0f, -1.0f,  0.0f, -1.0f,  0.0f, // bottom face
+         1.0f, -1.0f,  1.0f,  0.0f, -1.0f,  0.0f,
+        -1.0f, -1.0f,  1.0f,  0.0f, -1.0f,  0.0f,
+        -1.0f, -1.0f, -1.0f,  0.0f, -1.0f,  0.0f,
+
+        -1.0f,  1.0f, -1.0f,  0.0f,  1.0f,  0.0f, // top face
+         1.0f,  1.0f,  1.0f,  0.0f,  1.0f,  0.0f,
+         1.0f,  1.0f, -1.0f,  0.0f,  1.0f,  0.0f,
+        -1.0f,  1.0f,  1.0f,  0.0f,  1.0f,  0.0f,
+    };
+
+    static uint32_t s_CubeIndexBuffer[] =
+    {
+        20, 21, 22,
+        20, 23, 21,
+         6,  4,  5,
+         6,  7,  4,
+         2,  0,  1,
+         2,  3,  0,
+        16, 18, 19,
+        16, 17, 18,
+        10,  8,  9,
+        10, 11,  8,
+        14, 12, 13,
+        14, 15, 12,
+    };
+
+    static float s_PyramidVertexBuffer[] =
+    {
+        -1.0f, -1.0f, -1.0f,  0.0f, -1.0f,  0.0f, // bottom face
+         1.0f, -1.0f, -1.0f,  0.0f, -1.0f,  0.0f,
+         1.0f, -1.0f,  1.0f,  0.0f, -1.0f,  0.0f,
+        -1.0f, -1.0f,  1.0f,  0.0f, -1.0f,  0.0f,
+
+        -1.0f, -1.0f,  1.0f,  0.0f,  0.5f,  1.0f, // front face
+         1.0f, -1.0f,  1.0f,  0.0f,  0.5f,  1.0f,
+         0.0f,  1.0f,  0.0f,  0.0f,  0.5f,  1.0f,
+
+         1.0f, -1.0f,  1.0f,  1.0f,  0.5f,  0.0f, // right face
+         1.0f, -1.0f, -1.0f,  1.0f,  0.5f,  0.0f,
+         0.0f,  1.0f,  0.0f,  1.0f,  0.5f,  0.0f,
+
+         1.0f, -1.0f, -1.0f,  0.0f,  0.5f, -1.0f, // back face
+        -1.0f, -1.0f, -1.0f,  0.0f,  0.5f, -1.0f,
+         0.0f,  1.0f,  0.0f,  0.0f,  0.5f, -1.0f,
+
+        -1.0f, -1.0f, -1.0f, -1.0f,  0.5f,  0.0f, // left face
+        -1.0f, -1.0f,  1.0f, -1.0f,  0.5f,  0.0f,
+         0.0f,  1.0f,  0.0f, -1.0f,  0.5f,  0.0f,
+    };
+
+    static uint32_t s_PyramidIndexBuffer[] =
+    {
+         0,  1,  2,
+         0,  2,  3,
+         4,  5,  6,
+         7,  8,  9,
+        10, 11, 12,
+        13, 14, 15,
+    };
+
 	Ref<Mesh> MeshBuilder::CreateSphere()
 	{
         std::vector<SimpleVertex> vertices;
@@ -43,5 +126,17 @@ namespace OpenGLRendering {
         Ref<Material> material = CreateRef<Material>();
         return CreateRef<Mesh>("Sphere", vertices, indices, material, vertices.size(), indices.size() / 3);
 	}
+
+    Ref<Mesh> MeshBuilder::CreateCube()
+    {
+        Ref<Material> material = CreateRef<Material>();
+        return CreateRef<Mesh>("Cube", (SimpleVertex*)s_CubeVertexBuffer, s_CubeIndexBuffer, material, 24, 12);
+    }
+
+    Ref<Mesh> MeshBuilder::CreatePyramid()
+    {
+        Ref<Material> material = CreateRef<Material>();
+        return CreateRef<Mesh>("Pyramid", (SimpleVertex*)s_PyramidVertexBuffer, s_PyramidIndexBuffer, material, 16, 6);
+    }
 
 }
