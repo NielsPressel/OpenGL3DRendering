@@ -48,6 +48,7 @@ namespace OpenGLRendering {
 		Scope<ImGuiLayer> m_ImGuiLayer;
 		Scope<CameraController> m_CameraController;
 		Scope<Framebuffer> m_Framebuffer;
+		Scope<Framebuffer> m_IntermediateFramebuffer;
 		
 		Ref<Model> m_Model;
 		Ref<Mesh> m_Sphere;

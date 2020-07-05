@@ -79,9 +79,13 @@ namespace OpenGLRendering {
 	void ApplicationHandler::OnStartup()
 	{
 		// Create custom framebuffer to render to texture instead of screen
-		FramebufferSettings settings = { 1920, 1080 };
+		FramebufferSettings settings = { 1920, 1080, true, true, 8};
 		m_Framebuffer = CreateScope<Framebuffer>(settings);
 		m_Framebuffer->Unbind();
+
+		settings = { 1920, 1080 };
+		m_IntermediateFramebuffer = CreateScope<Framebuffer>(settings);
+		m_IntermediateFramebuffer->Unbind();
 
 		Renderer::Init();
 		m_Cubemap = CreateRef<Cubemap>("src/Resources/Assets/textures/cubemap/newport_loft.hdr");
@@ -100,11 +104,10 @@ namespace OpenGLRendering {
 		m_Cube->GetMaterial()->SetMetallic(0.0f);
 		m_Cube->GetMaterial()->SetAmbientOcclusion(1.0f);
 
-		// TODO: Check weird reflection on pyramid
 		m_Pyramid = MeshBuilder::CreatePyramid();
 		m_Pyramid->GetMaterial()->UseTextures(false);
 		m_Pyramid->GetMaterial()->SetAlbedo({ 0.0f, 0.0f, 1.0f });
-		m_Pyramid->GetMaterial()->SetRoughness(0.0f);
+		m_Pyramid->GetMaterial()->SetRoughness(0.3f);
 		m_Pyramid->GetMaterial()->SetMetallic(0.0f);
 		m_Pyramid->GetMaterial()->SetAmbientOcclusion(1.0f);
 
@@ -200,6 +203,8 @@ namespace OpenGLRendering {
 		glm::mat4 modelCube = glm::translate(glm::mat4(1.0f), { 0.0f, 5.0f, 0.0f });
 		glm::mat4 modelPyramid = glm::translate(glm::mat4(1.0f), { 0.0f, 0.0f, -5.0f });
 
+		modelCube = glm::rotate(modelCube, 3.14f, { 1.0f, 0.5f, 0.0f });
+
 		LightInfo lightInfo = { m_LightPos, m_LightColor };
 		Renderer::BeginScene(m_CameraController->GetCamera(), m_Cubemap, lightInfo);
 		Renderer::Submit(m_Model);
@@ -207,7 +212,12 @@ namespace OpenGLRendering {
 		Renderer::Submit(m_Cube, modelCube);
 		Renderer::Submit(m_Pyramid, modelPyramid);
 		Renderer::EndScene();
-		
+
+		m_Framebuffer->BindForRead();
+		m_IntermediateFramebuffer->BindForWrite();
+
+		glBlitFramebuffer(0, 0, m_Framebuffer->GetSettings().Width, m_Framebuffer->GetSettings().Height, 0, 0, m_Framebuffer->GetSettings().Width, m_Framebuffer->GetSettings().Height, GL_COLOR_BUFFER_BIT, GL_NEAREST);
+
 		m_Framebuffer->Unbind();
 		RendererAPI::SetViewport(0, 0, m_Window->GetWidth(), m_Window->GetHeight());
 	}
@@ -347,11 +357,10 @@ namespace OpenGLRendering {
 		const FramebufferSettings& framebufferSettings = m_Framebuffer->GetSettings();
 		if (framebufferSettings.Width != size.x || framebufferSettings.Height != size.y)
 		{
-			FramebufferSettings settings = { size.x, size.y };
-			m_Framebuffer->SetSettings(settings);
-			m_Framebuffer->Invalidate();
+			m_Framebuffer->Resize(size.x, size.y);
+			m_IntermediateFramebuffer->Resize(size.x, size.y);
 		}
-		ImGui::Image((void*)m_Framebuffer->GetColorTextureId(), size);
+		ImGui::Image((void*)m_IntermediateFramebuffer->GetColorTextureId(), size, { 0, 1 }, { 1, 0 });
 
 		ImGui::End();
 		ImGui::PopStyleVar();

@@ -115,6 +115,7 @@ namespace OpenGLRendering {
 
 		// Load image data
 		int width, height, channels;
+		stbi_set_flip_vertically_on_load(true);
 		float* data = stbi_loadf(filepath.c_str(), &width, &height, &channels, 0);
 
 		OGL_ASSERT(data, "Couldn't load cubemap texture from {0}!", filepath);

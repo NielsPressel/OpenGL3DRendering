@@ -10,6 +10,10 @@ namespace OpenGLRendering {
 	struct FramebufferSettings
 	{
 		uint32_t Width, Height;
+
+		bool EnableDepthStencil = true;
+		bool EnableMultisampling = false;
+		uint8_t NumberSamples = 0;
 	};
 
 	class Framebuffer
@@ -23,6 +27,9 @@ namespace OpenGLRendering {
 		void Bind() const;
 		void Unbind() const;
 
+		void BindForRead() const;
+		void BindForWrite() const;
+
 		void SetSettings(const FramebufferSettings& settings) { m_Settings = settings; }
 		uint32_t GetColorTextureId() const { return m_ColorTextureId; }
 		const FramebufferSettings& GetSettings() const { return m_Settings; }
@@ -30,7 +37,8 @@ namespace OpenGLRendering {
 	private:
 		uint32_t m_RendererId;
 		uint32_t m_ColorTextureId;
-		uint32_t m_DepthTextureId;
+		uint32_t m_RenderbufferId;
+
 		FramebufferSettings m_Settings;
 	};
 

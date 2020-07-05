@@ -77,6 +77,7 @@ void main()
 	vec3 F0 = vec3(0.04);
 	F0 = mix(F0, albedo, metallic);
 
+	// light sources
 	vec3 Lo = vec3(0.0);
 
 	vec3 L = normalize(u_LightPos - v_WorldPos);
@@ -99,8 +100,10 @@ void main()
 
 	float NdotL = max(dot(N, L), 0.0);
 	Lo += (kD * albedo / PI + specular) * radiance * NdotL;
-
-	kS = FresnelSchlickRoughness(max(dot(N, V), 0.0), F0, roughness);
+	
+	// ambient
+	F = FresnelSchlickRoughness(max(dot(N, V), 0.0), F0, roughness);
+	kS = F;
 	kD = 1.0 - kS;
 	kD *= 1.0 - metallic;
 	vec3 irradiance = texture(u_IrradianceMap, N).rgb;
