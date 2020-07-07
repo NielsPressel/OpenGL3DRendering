@@ -93,7 +93,7 @@ namespace OpenGLRendering {
 		m_Sphere = MeshBuilder::CreateSphere();
 		m_Sphere->GetMaterial()->UseTextures(false);
 		m_Sphere->GetMaterial()->SetAlbedo({ 1.0f, 0.0f, 0.0f });
-		m_Sphere->GetMaterial()->SetRoughness(1.0f);
+		m_Sphere->GetMaterial()->SetRoughness(0.25f);
 		m_Sphere->GetMaterial()->SetMetallic(1.0f);
 		m_Sphere->GetMaterial()->SetAmbientOcclusion(1.0f);
 
@@ -118,15 +118,15 @@ namespace OpenGLRendering {
 		m_Model->SetRotation({ 0.0f, 0.0f, 0.0f });
 		m_Model->SetScale({ 0.1f, 0.1f, 0.1f });
 
-		Ref<Texture2D> diffuseTexture = CreateRef<Texture2D>("src/Resources/Assets/textures/Pistol_Albedo.png", TextureType::ALBEDO);
-		Ref<Texture2D> normalTexture = CreateRef<Texture2D>("src/Resources/Assets/textures/Pistol_Normal.png", TextureType::NORMAL);
-		Ref<Texture2D> metallicSmoothnessTexture = CreateRef<Texture2D>("src/Resources/Assets/textures/Pistol_MetallicSmooth.png", TextureType::METALLIC_SMOOTHNESS);
-		Ref<Texture2D> ambientOcclusionTexture = CreateRef<Texture2D>("src/Resources/Assets/textures/Pistol_Occlusion.png", TextureType::AMBIENT_OCCLUSION);
+		Ref<Texture2D> diffuseTexture = CreateRef<Texture2D>("src/Resources/Assets/textures/Pistol_Albedo.png");
+		Ref<Texture2D> normalTexture = CreateRef<Texture2D>("src/Resources/Assets/textures/Pistol_Normal.png");
+		Ref<Texture2D> metallicSmoothnessTexture = CreateRef<Texture2D>("src/Resources/Assets/textures/Pistol_MetallicSmooth.png");
+		Ref<Texture2D> ambientOcclusionTexture = CreateRef<Texture2D>("src/Resources/Assets/textures/Pistol_Occlusion.png");
 
-		m_Model->GetMeshes()[0].GetMaterial()->AddTexture(diffuseTexture);
-		m_Model->GetMeshes()[0].GetMaterial()->AddTexture(normalTexture);
-		m_Model->GetMeshes()[0].GetMaterial()->AddTexture(metallicSmoothnessTexture);
-		m_Model->GetMeshes()[0].GetMaterial()->AddTexture(ambientOcclusionTexture);
+		m_Model->GetMeshes()[0].GetMaterial()->SetTextureOfType(TextureType::ALBEDO, diffuseTexture);
+		m_Model->GetMeshes()[0].GetMaterial()->SetTextureOfType(TextureType::NORMAL, normalTexture);
+		m_Model->GetMeshes()[0].GetMaterial()->SetTextureOfType(TextureType::METALLIC_SMOOTHNESS, metallicSmoothnessTexture);
+		m_Model->GetMeshes()[0].GetMaterial()->SetTextureOfType(TextureType::AMBIENT_OCCLUSION, ambientOcclusionTexture);
 		m_Model->GetMeshes()[0].GetMaterial()->UseTextures(true);
 #endif
 
@@ -183,6 +183,12 @@ namespace OpenGLRendering {
 		m_Model->GetMeshes()[4].GetMaterial()->AddTexture(albedoTexture05);
 		m_Model->GetMeshes()[4].GetMaterial()->AddTexture(normalTexture05);
 		m_Model->GetMeshes()[4].GetMaterial()->AddTexture(metallicSmoothTexture05);
+		
+		m_Model->GetMeshes()[0].GetMaterial()->UseTextures(true);
+		m_Model->GetMeshes()[1].GetMaterial()->UseTextures(true);
+		m_Model->GetMeshes()[2].GetMaterial()->UseTextures(true);
+		m_Model->GetMeshes()[3].GetMaterial()->UseTextures(true);
+		m_Model->GetMeshes()[4].GetMaterial()->UseTextures(true);
 #endif
 
 		m_CameraController = CreateScope<CameraController>(glm::vec3(0.0f, 0.0f, 0.0f));
@@ -207,7 +213,7 @@ namespace OpenGLRendering {
 
 		LightInfo lightInfo = { m_LightPos, m_LightColor };
 		Renderer::BeginScene(m_CameraController->GetCamera(), m_Cubemap, lightInfo);
-		Renderer::Submit(m_Model);
+		Renderer::Submit(m_Model, 0, 5);
 		Renderer::Submit(m_Sphere, modelSphere);
 		Renderer::Submit(m_Cube, modelCube);
 		Renderer::Submit(m_Pyramid, modelPyramid);
@@ -299,10 +305,10 @@ namespace OpenGLRendering {
 				{
 					ImGui::ColorEdit4("Base Color", (float*)&mesh.GetMaterial()->GetBaseColor());
 
-					for (const Ref<Texture2D>& texture : mesh.GetMaterial()->GetTextures())
-					{
-						ImGui::Text(texture->GetPath().c_str());
-					}
+					// for (const Ref<Texture2D>& texture : mesh.GetMaterial()->GetTextures())
+					// {
+					// 	ImGui::Text(texture->GetPath().c_str());
+					// }
 
 					ImGui::TreePop();
 				}

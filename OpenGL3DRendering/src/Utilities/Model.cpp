@@ -106,7 +106,7 @@ namespace OpenGLRendering {
 	{
 		std::vector<Vertex> vertices;
 		std::vector<uint32_t> indices;
-		std::vector<Ref<Texture2D>> textures;
+		// std::vector<Ref<Texture2D>> textures;
 
 		float xMin = 0.0f, xMax = 0.0f, yMin = 0.0f, yMax = 0.0f, zMin = 0.0f, zMax = 0.0f;
 
@@ -187,13 +187,13 @@ namespace OpenGLRendering {
 		material->Get(AI_MATKEY_COLOR_DIFFUSE, color);
 		glm::vec4 baseColor(color.r, color.g, color.b, 1.0f);
 
-		std::vector<Ref<Texture2D>> diffuseMaps = LoadMaterialTextures(material, aiTextureType_DIFFUSE, scene);
-		textures.insert(textures.end(), diffuseMaps.begin(), diffuseMaps.end());
+		// std::vector<Ref<Texture2D>> diffuseMaps = LoadMaterialTextures(material, aiTextureType_DIFFUSE, scene);
+		// textures.insert(textures.end(), diffuseMaps.begin(), diffuseMaps.end());
+		// 
+		// std::vector<Ref<Texture2D>> normalMaps = LoadMaterialTextures(material, aiTextureType_NORMALS, scene);
+		// textures.insert(textures.end(), normalMaps.begin(), normalMaps.end());
 
-		std::vector<Ref<Texture2D>> normalMaps = LoadMaterialTextures(material, aiTextureType_NORMALS, scene);
-		textures.insert(textures.end(), normalMaps.begin(), normalMaps.end());
-
-		Ref<Material> mat = CreateRef<Material>(textures);
+		Ref<Material> mat = CreateRef<Material>();
 		mat->SetAlbedo(baseColor);
 
 		glm::vec3 boundingBoxCenter = { (xMin + xMax) / 2.0f, (yMin + yMax) / 2.0f, (zMin + zMax) / 2.0f };
@@ -216,7 +216,7 @@ namespace OpenGLRendering {
 			{
 				if (texture->mHeight == 0) // Texture is compressed
 				{
-					textures.push_back(CreateRef<Texture2D>(texture->mWidth, (unsigned char*)texture->pcData, path, GetTypeFromAIType(type)));
+					textures.push_back(CreateRef<Texture2D>(texture->mWidth, (unsigned char*)texture->pcData, path));
 				}
 				else
 				{

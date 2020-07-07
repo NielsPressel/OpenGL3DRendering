@@ -1,7 +1,7 @@
 #pragma once
 
 #include <glm/glm.hpp>
-#include <vector>
+#include <unordered_map>
 
 #include "Texture.h"
 
@@ -13,16 +13,16 @@ namespace OpenGLRendering {
 	{
 	public:
 		Material();
-		Material(const std::vector<Ref<Texture2D>>& textures);
+		Material(const std::unordered_map<TextureType, Ref<Texture2D>>& textures);
 
-		void AddTexture(const Ref<Texture2D>& texture) { m_Textures.push_back(texture); }
+		void SetTextureOfType(TextureType type, const Ref<Texture2D>& texture) { m_Textures[type] = texture; }
 		void SetAlbedo(const glm::vec3& albedo) { m_Albedo = albedo; }
 		void SetRoughness(float roughness) { m_Roughness = roughness; }
 		void SetMetallic(float metallic) { m_Metallic = metallic; }
 		void SetAmbientOcclusion(float ao) { m_AmbientOcclusion = ao; }
 		void UseTextures(bool use) { m_UseTextures = use; }
 		
-		const std::vector<Ref<Texture2D>>& GetTextures() const { return m_Textures; }
+		const std::unordered_map<TextureType, Ref<Texture2D>>& GetTextures() const { return m_Textures; }
 		const glm::vec3& GetAlbedo() const { return m_Albedo; }
 
 		glm::vec3& GetBaseColor() { return m_Albedo; }
@@ -32,7 +32,7 @@ namespace OpenGLRendering {
 		bool IsUsingTextures() { return m_UseTextures; }
 
 	private:
-		std::vector<Ref<Texture2D>> m_Textures;
+		std::unordered_map<TextureType, Ref<Texture2D>> m_Textures;
 		
 		glm::vec3 m_Albedo;
 		float m_Roughness;

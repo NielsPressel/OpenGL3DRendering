@@ -67,28 +67,18 @@ namespace OpenGLRendering {
 				s_RendererData.PBRShaderTextured->SetInt("u_PrefilterMap", 1);
 				s_RendererData.PBRShaderTextured->SetInt("u_BrdfLutTexture", 2);
 
-				for (const Ref<Texture2D>& texture : mesh.Material->GetTextures())
-				{
-					switch (texture->GetType())
-					{
-					case TextureType::ALBEDO:
-						texture->Bind(3);
-						s_RendererData.PBRShaderTextured->SetInt("u_TextureAlbedo", 3);
-						break;
-					case TextureType::NORMAL:
-						texture->Bind(4);
-						s_RendererData.PBRShaderTextured->SetInt("u_TextureNormal", 4);
-						break;
-					case TextureType::METALLIC_SMOOTHNESS:
-						texture->Bind(5);
-						s_RendererData.PBRShaderTextured->SetInt("u_TextureMetallicSmooth", 5);
-						break;
-					case TextureType::AMBIENT_OCCLUSION:
-						texture->Bind(6);
-						s_RendererData.PBRShaderTextured->SetInt("u_TextureAmbient", 6);
-						break;
-					}
-				}
+				const std::unordered_map<TextureType, Ref<Texture2D>>& textures = mesh.Material->GetTextures();
+				textures.at(TextureType::ALBEDO)->Bind(3);
+				s_RendererData.PBRShaderTextured->SetInt("u_TextureAlbedo", 3);
+
+				textures.at(TextureType::NORMAL)->Bind(4);
+				s_RendererData.PBRShaderTextured->SetInt("u_TextureNormal", 4);
+
+				textures.at(TextureType::METALLIC_SMOOTHNESS)->Bind(5);
+				s_RendererData.PBRShaderTextured->SetInt("u_TextureMetallicSmooth", 5);
+
+				textures.at(TextureType::AMBIENT_OCCLUSION)->Bind(6);
+				s_RendererData.PBRShaderTextured->SetInt("u_TextureAmbient", 6);
 
 				RendererAPI::DrawIndexed(mesh.VertexArray, 0);
 			}
@@ -132,6 +122,15 @@ namespace OpenGLRendering {
 	}
 
 	void Renderer::Submit(Ref<Model>& model, uint16_t lod, uint16_t meshesPerLod)
+	{
+		for (unsigned int i = lod * meshesPerLod; i < (lod + 1) * meshesPerLod && i < model->GetMeshes().size(); i++)
+		{
+			const Mesh& mesh = model->GetMeshes()[i];
+			s_RendererData.Meshes.push_back({ mesh.GetVertexArray(), mesh.GetMaterial(), model->GetModelMatrix() });
+		}
+	}
+
+	void Renderer::Submit(Ref<Model>& model)
 	{
 		for (const Mesh& mesh : model->GetMeshes())
 		{

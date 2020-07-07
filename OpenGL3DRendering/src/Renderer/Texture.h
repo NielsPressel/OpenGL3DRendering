@@ -5,7 +5,7 @@
 
 namespace OpenGLRendering {
 
-	enum TextureType : uint16_t
+	enum class TextureType : uint16_t
 	{
 		DIFFUSE = 0, ALBEDO, NORMAL, METALLIC, ROUGHNESS, AMBIENT_OCCLUSION, METALLIC_SMOOTHNESS
 	};
@@ -14,15 +14,14 @@ namespace OpenGLRendering {
 	class Texture2D
 	{
 	public:
-		Texture2D(const std::string& filePath, TextureType type);
-		Texture2D(uint32_t size, unsigned char* data, const std::string& path, TextureType type);
+		Texture2D(const std::string& filePath);
+		Texture2D(uint32_t size, unsigned char* data, const std::string& path);
 		~Texture2D();
 
 		uint32_t GetWidth() const { return m_Width; }
 		uint32_t GetHeight() const { return m_Height; }
 		uint32_t GetRendererID() const { return m_RendererID; }
 		const std::string& GetPath() const { return m_Path; }
-		TextureType GetType() const { return m_Type; }
 
 		void SetData(void* data, uint32_t size);
 
@@ -37,7 +36,6 @@ namespace OpenGLRendering {
 		uint32_t m_Width, m_Height;
 		std::string m_Path;
 		uint32_t m_InternalFormat, m_DataFormat;
-		TextureType m_Type;
 	};
 
 }

@@ -23,7 +23,9 @@ namespace OpenGLRendering {
 		static void EndScene();
 		
 		static void Submit(Ref<Mesh>& mesh, const glm::mat4& modelMatrix = glm::identity<glm::mat4>());
-		static void Submit(Ref<Model>& model, uint16_t lod = 0, uint16_t meshesPerLod = 0);
+
+		static void Submit(Ref<Model>& model);
+		static void Submit(Ref<Model>& model, uint16_t lod, uint16_t meshesPerLod);
 
 	};
 

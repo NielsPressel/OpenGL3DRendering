@@ -7,8 +7,8 @@
 
 namespace OpenGLRendering {
 
-	Texture2D::Texture2D(const std::string& filePath, TextureType type)
-		: m_Path(filePath), m_Type(type)
+	Texture2D::Texture2D(const std::string& filePath)
+		: m_Path(filePath)
 	{
 		int width, height, channels;
 		stbi_set_flip_vertically_on_load(1);
@@ -52,8 +52,8 @@ namespace OpenGLRendering {
 		stbi_image_free(data);
 	}
 
-	Texture2D::Texture2D(uint32_t size, unsigned char* data, const std::string& path, TextureType type)
-		: m_Path(path), m_Type(type)
+	Texture2D::Texture2D(uint32_t size, unsigned char* data, const std::string& path)
+		: m_Path(path)
 	{
 		int width, height, channels;
 
