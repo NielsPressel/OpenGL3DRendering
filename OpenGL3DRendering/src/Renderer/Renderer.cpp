@@ -25,6 +25,8 @@ namespace OpenGLRendering {
 
 		std::vector<MeshInfo> Meshes;
 		LightInfo LightInfo;
+
+		RendererStats Stats;
 	};
 
 	static RendererData s_RendererData;
@@ -41,6 +43,10 @@ namespace OpenGLRendering {
 		s_RendererData.Camera = camera;
 		s_RendererData.Cubemap = cubemap;
 		s_RendererData.LightInfo = lightInfo;
+
+		s_RendererData.Stats.VertexCount = 0;
+		s_RendererData.Stats.FaceCount = 0;
+		s_RendererData.Stats.DrawCalls = 0;
 	}
 
 	void Renderer::EndScene()
@@ -68,19 +74,33 @@ namespace OpenGLRendering {
 				s_RendererData.PBRShaderTextured->SetInt("u_BrdfLutTexture", 2);
 
 				const std::unordered_map<TextureType, Ref<Texture2D>>& textures = mesh.Material->GetTextures();
-				textures.at(TextureType::ALBEDO)->Bind(3);
-				s_RendererData.PBRShaderTextured->SetInt("u_TextureAlbedo", 3);
+				
+				if (textures.find(TextureType::ALBEDO) != textures.end())
+				{
+					textures.at(TextureType::ALBEDO)->Bind(3);
+					s_RendererData.PBRShaderTextured->SetInt("u_TextureAlbedo", 3);
+				}
 
-				textures.at(TextureType::NORMAL)->Bind(4);
-				s_RendererData.PBRShaderTextured->SetInt("u_TextureNormal", 4);
+				if (textures.find(TextureType::NORMAL) != textures.end())
+				{
+					textures.at(TextureType::NORMAL)->Bind(4);
+					s_RendererData.PBRShaderTextured->SetInt("u_TextureNormal", 4);
+				}
 
-				textures.at(TextureType::METALLIC_SMOOTHNESS)->Bind(5);
-				s_RendererData.PBRShaderTextured->SetInt("u_TextureMetallicSmooth", 5);
+				if (textures.find(TextureType::METALLIC_SMOOTHNESS) != textures.end())
+				{
+					textures.at(TextureType::METALLIC_SMOOTHNESS)->Bind(5);
+					s_RendererData.PBRShaderTextured->SetInt("u_TextureMetallicSmooth", 5);
+				}
 
-				textures.at(TextureType::AMBIENT_OCCLUSION)->Bind(6);
-				s_RendererData.PBRShaderTextured->SetInt("u_TextureAmbient", 6);
+				if (textures.find(TextureType::AMBIENT_OCCLUSION) != textures.end())
+				{
+					textures.at(TextureType::AMBIENT_OCCLUSION)->Bind(6);
+					s_RendererData.PBRShaderTextured->SetInt("u_TextureAmbient", 6);
+				}
 
 				RendererAPI::DrawIndexed(mesh.VertexArray, 0);
+				s_RendererData.Stats.DrawCalls += 1;
 			}
 			else
 			{
@@ -102,6 +122,7 @@ namespace OpenGLRendering {
 				s_RendererData.PBRShader->SetFloat("u_Ambient", mesh.Material->GetAmbientOcclusion());
 
 				RendererAPI::DrawIndexed(mesh.VertexArray, 0);
+				s_RendererData.Stats.DrawCalls += 1;
 			}
 		}
 
@@ -112,6 +133,7 @@ namespace OpenGLRendering {
 		s_RendererData.CubemapShader->SetInt("u_EnvironmentMap", 0);
 
 		RendererAPI::DrawIndexed(s_RendererData.Cubemap->GetVertexArray(), 0);
+		s_RendererData.Stats.DrawCalls += 1;
 
 		s_RendererData.Meshes.clear();
 	}
@@ -119,6 +141,8 @@ namespace OpenGLRendering {
 	void Renderer::Submit(Ref<Mesh>& mesh, const glm::mat4& modelMatrix)
 	{
 		s_RendererData.Meshes.push_back({ mesh->GetVertexArray(), mesh->GetMaterial(), modelMatrix });
+		s_RendererData.Stats.VertexCount += mesh->GetVertexCount();
+		s_RendererData.Stats.FaceCount += mesh->GetFaceCount();
 	}
 
 	void Renderer::Submit(Ref<Model>& model, uint16_t lod, uint16_t meshesPerLod)
@@ -127,6 +151,8 @@ namespace OpenGLRendering {
 		{
 			const Mesh& mesh = model->GetMeshes()[i];
 			s_RendererData.Meshes.push_back({ mesh.GetVertexArray(), mesh.GetMaterial(), model->GetModelMatrix() });
+			s_RendererData.Stats.VertexCount += mesh.GetVertexCount();
+			s_RendererData.Stats.FaceCount += mesh.GetFaceCount();
 		}
 	}
 
@@ -135,6 +161,13 @@ namespace OpenGLRendering {
 		for (const Mesh& mesh : model->GetMeshes())
 		{
 			s_RendererData.Meshes.push_back({ mesh.GetVertexArray(), mesh.GetMaterial(), model->GetModelMatrix() });
+			s_RendererData.Stats.VertexCount += mesh.GetVertexCount();
+			s_RendererData.Stats.FaceCount += mesh.GetFaceCount();
 		}
+	}
+
+	const RendererStats& Renderer::GetStatistics()
+	{
+		return s_RendererData.Stats;
 	}
 }

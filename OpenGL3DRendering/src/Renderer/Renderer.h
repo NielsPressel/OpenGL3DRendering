@@ -14,6 +14,13 @@ namespace OpenGLRendering {
 		glm::vec3 LightColor;
 	};
 
+	struct RendererStats
+	{
+		uint32_t VertexCount;
+		uint32_t FaceCount;
+		uint32_t DrawCalls;
+	};
+
 	class Renderer {
 	public:
 
@@ -26,6 +33,8 @@ namespace OpenGLRendering {
 
 		static void Submit(Ref<Model>& model);
 		static void Submit(Ref<Model>& model, uint16_t lod, uint16_t meshesPerLod);
+
+		static const RendererStats& GetStatistics();
 
 	};
 

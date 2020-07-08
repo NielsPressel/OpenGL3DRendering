@@ -138,52 +138,51 @@ namespace OpenGLRendering {
 		m_Model->SetRotation({ 0.0f, 0.0f, 0.0f });
 		m_Model->SetScale({ 0.01f, 0.01f, 0.01f });
 
-		Ref<Texture2D> albedoTexture01 = CreateRef<Texture2D>("src/Resources/Assets/textures/Dropship_01_Albedo.png", TextureType::ALBEDO);
-		Ref<Texture2D> normalTexture01 = CreateRef<Texture2D>("src/Resources/Assets/textures/Dropship_01_Normal.png", TextureType::NORMAL);
-		Ref<Texture2D> metallicSmoothTexture01 = CreateRef<Texture2D>("src/Resources/Assets/textures/Dropship_01_MetallicSmooth.png", TextureType::METALLIC_SMOOTHNESS);
-		Ref<Texture2D> occlusionTexture01 = CreateRef<Texture2D>("src/Resources/Assets/textures/Dropship_01_Occlusion.png", TextureType::AMBIENT_OCCLUSION);
+		Ref<Texture2D> albedoTexture01 = CreateRef<Texture2D>("src/Resources/Assets/textures/Dropship_01_Albedo.png");
+		Ref<Texture2D> normalTexture01 = CreateRef<Texture2D>("src/Resources/Assets/textures/Dropship_01_Normal.png");
+		Ref<Texture2D> metallicSmoothTexture01 = CreateRef<Texture2D>("src/Resources/Assets/textures/Dropship_01_MetallicSmooth.png");
+		Ref<Texture2D> occlusionTexture01 = CreateRef<Texture2D>("src/Resources/Assets/textures/Dropship_01_Occlusion.png");
 
-		Ref<Texture2D> albedoTexture02 = CreateRef<Texture2D>("src/Resources/Assets/textures/Dropship_02_Albedo.png", TextureType::ALBEDO);
-		Ref<Texture2D> normalTexture02 = CreateRef<Texture2D>("src/Resources/Assets/textures/Dropship_02_Normal.png", TextureType::NORMAL);
-		Ref<Texture2D> metallicSmoothTexture02 = CreateRef<Texture2D>("src/Resources/Assets/textures/Dropship_02_MetallicSmooth.png", TextureType::METALLIC_SMOOTHNESS);
-		Ref<Texture2D> occlusionTexture02 = CreateRef<Texture2D>("src/Resources/Assets/textures/Dropship_02_Occlusion.png", TextureType::AMBIENT_OCCLUSION);
+		Ref<Texture2D> albedoTexture02 = CreateRef<Texture2D>("src/Resources/Assets/textures/Dropship_02_Albedo.png");
+		Ref<Texture2D> normalTexture02 = CreateRef<Texture2D>("src/Resources/Assets/textures/Dropship_02_Normal.png");
+		Ref<Texture2D> metallicSmoothTexture02 = CreateRef<Texture2D>("src/Resources/Assets/textures/Dropship_02_MetallicSmooth.png");
+		Ref<Texture2D> occlusionTexture02 = CreateRef<Texture2D>("src/Resources/Assets/textures/Dropship_02_Occlusion.png");
 
-		Ref<Texture2D> albedoTexture03 = CreateRef<Texture2D>("src/Resources/Assets/textures/Dropship_03_Albedo.png", TextureType::ALBEDO);
-		Ref<Texture2D> normalTexture03 = CreateRef<Texture2D>("src/Resources/Assets/textures/Dropship_03_Normal.png", TextureType::NORMAL);
-		Ref<Texture2D> metallicSmoothTexture03 = CreateRef<Texture2D>("src/Resources/Assets/textures/Dropship_03_MetallicSmooth.png", TextureType::METALLIC_SMOOTHNESS);
-		Ref<Texture2D> occlusionTexture03 = CreateRef<Texture2D>("src/Resources/Assets/textures/Dropship_03_Occlusion.png", TextureType::AMBIENT_OCCLUSION);
+		Ref<Texture2D> albedoTexture03 = CreateRef<Texture2D>("src/Resources/Assets/textures/Dropship_03_Albedo.png");
+		Ref<Texture2D> normalTexture03 = CreateRef<Texture2D>("src/Resources/Assets/textures/Dropship_03_Normal.png");
+		Ref<Texture2D> metallicSmoothTexture03 = CreateRef<Texture2D>("src/Resources/Assets/textures/Dropship_03_MetallicSmooth.png");
+		Ref<Texture2D> occlusionTexture03 = CreateRef<Texture2D>("src/Resources/Assets/textures/Dropship_03_Occlusion.png");
 
-		Ref<Texture2D> albedoTexture04 = CreateRef<Texture2D>("src/Resources/Assets/textures/Dropship_04_Albedo.png", TextureType::ALBEDO);
-		Ref<Texture2D> metallicSmoothTexture04 = CreateRef<Texture2D>("src/Resources/Assets/textures/Dropship_04_MetallicSmooth.png", TextureType::METALLIC_SMOOTHNESS);
-		Ref<Texture2D> occlusionTexture04 = CreateRef<Texture2D>("src/Resources/Assets/textures/Dropship_04_Occlusion.png", TextureType::AMBIENT_OCCLUSION);
+		Ref<Texture2D> albedoTexture04 = CreateRef<Texture2D>("src/Resources/Assets/textures/Dropship_04_Albedo.png");
+		Ref<Texture2D> metallicSmoothTexture04 = CreateRef<Texture2D>("src/Resources/Assets/textures/Dropship_04_MetallicSmooth.png");
+		Ref<Texture2D> occlusionTexture04 = CreateRef<Texture2D>("src/Resources/Assets/textures/Dropship_04_Occlusion.png");
 
-		Ref<Texture2D> albedoTexture05 = CreateRef<Texture2D>("src/Resources/Assets/textures/Dropship_05_Albedo.png", TextureType::ALBEDO);
-		Ref<Texture2D> normalTexture05 = CreateRef<Texture2D>("src/Resources/Assets/textures/Dropship_05_Normal.png", TextureType::NORMAL);
-		Ref<Texture2D> metallicSmoothTexture05 = CreateRef<Texture2D>("src/Resources/Assets/textures/Dropship_05_MetallicSmooth.png", TextureType::METALLIC_SMOOTHNESS);
+		Ref<Texture2D> albedoTexture05 = CreateRef<Texture2D>("src/Resources/Assets/textures/Dropship_05_Albedo.png");
+		Ref<Texture2D> normalTexture05 = CreateRef<Texture2D>("src/Resources/Assets/textures/Dropship_05_Normal.png");
+		Ref<Texture2D> metallicSmoothTexture05 = CreateRef<Texture2D>("src/Resources/Assets/textures/Dropship_05_MetallicSmooth.png");
 
-		m_Model->GetMeshes()[0].GetMaterial()->AddTexture(albedoTexture01);
-		m_Model->GetMeshes()[0].GetMaterial()->AddTexture(normalTexture01);
-		m_Model->GetMeshes()[0].GetMaterial()->AddTexture(metallicSmoothTexture01);
-		m_Model->GetMeshes()[0].GetMaterial()->AddTexture(occlusionTexture01);
+		m_Model->GetMeshes()[0].GetMaterial()->SetTextureOfType(TextureType::ALBEDO, albedoTexture01);
+		m_Model->GetMeshes()[0].GetMaterial()->SetTextureOfType(TextureType::NORMAL, normalTexture01);
+		m_Model->GetMeshes()[0].GetMaterial()->SetTextureOfType(TextureType::METALLIC_SMOOTHNESS, metallicSmoothTexture01);
+		m_Model->GetMeshes()[0].GetMaterial()->SetTextureOfType(TextureType::AMBIENT_OCCLUSION, occlusionTexture01);
 
-		m_Model->GetMeshes()[1].GetMaterial()->AddTexture(albedoTexture02);
-		m_Model->GetMeshes()[1].GetMaterial()->AddTexture(normalTexture02);
-		m_Model->GetMeshes()[1].GetMaterial()->AddTexture(metallicSmoothTexture02);
-		m_Model->GetMeshes()[1].GetMaterial()->AddTexture(occlusionTexture02);
+		m_Model->GetMeshes()[1].GetMaterial()->SetTextureOfType(TextureType::ALBEDO, albedoTexture02);
+		m_Model->GetMeshes()[1].GetMaterial()->SetTextureOfType(TextureType::NORMAL, normalTexture02);
+		m_Model->GetMeshes()[1].GetMaterial()->SetTextureOfType(TextureType::METALLIC_SMOOTHNESS, metallicSmoothTexture02);
+		m_Model->GetMeshes()[1].GetMaterial()->SetTextureOfType(TextureType::AMBIENT_OCCLUSION, occlusionTexture02);
 
-		m_Model->GetMeshes()[2].GetMaterial()->AddTexture(albedoTexture03);
-		m_Model->GetMeshes()[2].GetMaterial()->AddTexture(normalTexture03);
-		m_Model->GetMeshes()[2].GetMaterial()->AddTexture(metallicSmoothTexture03);
-		m_Model->GetMeshes()[2].GetMaterial()->AddTexture(occlusionTexture03);
+		m_Model->GetMeshes()[2].GetMaterial()->SetTextureOfType(TextureType::ALBEDO, albedoTexture03);
+		m_Model->GetMeshes()[2].GetMaterial()->SetTextureOfType(TextureType::NORMAL, normalTexture03);
+		m_Model->GetMeshes()[2].GetMaterial()->SetTextureOfType(TextureType::METALLIC_SMOOTHNESS, metallicSmoothTexture03);
+		m_Model->GetMeshes()[2].GetMaterial()->SetTextureOfType(TextureType::AMBIENT_OCCLUSION, occlusionTexture03);
 
-		m_Model->GetMeshes()[3].GetMaterial()->AddTexture(albedoTexture04);
-		m_Model->GetMeshes()[3].GetMaterial()->AddTexture(metallicSmoothTexture04);
-		m_Model->GetMeshes()[3].GetMaterial()->AddTexture(occlusionTexture04);
+		m_Model->GetMeshes()[3].GetMaterial()->SetTextureOfType(TextureType::ALBEDO, albedoTexture04);
+		m_Model->GetMeshes()[3].GetMaterial()->SetTextureOfType(TextureType::METALLIC_SMOOTHNESS, metallicSmoothTexture04);
+		m_Model->GetMeshes()[3].GetMaterial()->SetTextureOfType(TextureType::AMBIENT_OCCLUSION, occlusionTexture04);
 
-		m_Model->GetMeshes()[4].GetMaterial()->AddTexture(albedoTexture05);
-		m_Model->GetMeshes()[4].GetMaterial()->AddTexture(normalTexture05);
-		m_Model->GetMeshes()[4].GetMaterial()->AddTexture(metallicSmoothTexture05);
-		
+		m_Model->GetMeshes()[4].GetMaterial()->SetTextureOfType(TextureType::ALBEDO, albedoTexture05);
+		m_Model->GetMeshes()[4].GetMaterial()->SetTextureOfType(TextureType::NORMAL, normalTexture05);
+		m_Model->GetMeshes()[4].GetMaterial()->SetTextureOfType(TextureType::METALLIC_SMOOTHNESS, metallicSmoothTexture05);
 		m_Model->GetMeshes()[0].GetMaterial()->UseTextures(true);
 		m_Model->GetMeshes()[1].GetMaterial()->UseTextures(true);
 		m_Model->GetMeshes()[2].GetMaterial()->UseTextures(true);
@@ -348,8 +347,18 @@ namespace OpenGLRendering {
 		// Render Stats
 		ImGui::Begin("Render Stats");
 
+		const RendererStats& stats = Renderer::GetStatistics();
 		std::stringstream ss;
 		ss << "Frametime: " << t.GetMilliseconds() << ", FPS: " << 1000.0f / t.GetMilliseconds();
+		ImGui::Text(ss.str().c_str());
+		ss.str(std::string());
+		ss << "Vertex Count: " << stats.VertexCount;
+		ImGui::Text(ss.str().c_str());
+		ss.str(std::string());
+		ss << "Face Count: " << stats.FaceCount;
+		ImGui::Text(ss.str().c_str());
+		ss.str(std::string());
+		ss << "Draw Calls: " << stats.DrawCalls;
 		ImGui::Text(ss.str().c_str());
 
 		ImGui::End();
