@@ -34,6 +34,8 @@ namespace OpenGLRendering {
 		static void Submit(Ref<Model>& model);
 		static void Submit(Ref<Model>& model, uint16_t lod, uint16_t meshesPerLod);
 
+		static void ColorGrade(const glm::vec4& color);
+
 		static const RendererStats& GetStatistics();
 
 	};

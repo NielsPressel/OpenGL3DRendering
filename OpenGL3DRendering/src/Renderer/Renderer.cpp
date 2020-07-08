@@ -22,6 +22,7 @@ namespace OpenGLRendering {
 		Ref<Shader> PBRShaderTextured;
 		Ref<Shader> PBRShader;
 		Ref<Shader> CubemapShader;
+		Ref<Shader> ColorGradingShader;
 
 		std::vector<MeshInfo> Meshes;
 		LightInfo LightInfo;
@@ -36,6 +37,7 @@ namespace OpenGLRendering {
 		s_RendererData.PBRShaderTextured = CreateRef<Shader>("src/Resources/ShaderSource/PBR/vertex_textured_pbr.glsl", "src/Resources/ShaderSource/PBR/fragment_textured_pbr.glsl");
 		s_RendererData.PBRShader = CreateRef<Shader>("src/Resources/ShaderSource/PBR/vertex_static_pbr.glsl", "src/Resources/ShaderSource/PBR/fragment_static_pbr.glsl");
 		s_RendererData.CubemapShader = CreateRef<Shader>("src/Resources/ShaderSource/Cubemap/background_vertex.glsl", "src/Resources/ShaderSource/Cubemap/background_fragment.glsl");
+		s_RendererData.ColorGradingShader = CreateRef<Shader>("src/Resources/ShaderSource/PostProcessing/color_grading_vertex.glsl", "src/Resources/ShaderSource/PostProcessing/color_grading_fragment.glsl");
 	}
 
 	void Renderer::BeginScene(Ref<Camera>& camera, Ref<Cubemap>& cubemap, const LightInfo& lightInfo)
@@ -164,6 +166,11 @@ namespace OpenGLRendering {
 			s_RendererData.Stats.VertexCount += mesh.GetVertexCount();
 			s_RendererData.Stats.FaceCount += mesh.GetFaceCount();
 		}
+	}
+
+	void Renderer::ColorGrade(const glm::vec4& color)
+	{
+
 	}
 
 	const RendererStats& Renderer::GetStatistics()
