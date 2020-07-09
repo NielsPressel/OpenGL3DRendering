@@ -1,6 +1,7 @@
 #pragma once
 
 #include "VertexArray.h"
+#include "Framebuffer.h"
 
 #include <memory>
 #include <glm/glm.hpp>
@@ -17,6 +18,7 @@ namespace OpenGLRendering {
 		static void SetClearColor(const glm::vec4& color);
 		static void Clear();
 		static void DrawIndexed(const std::shared_ptr<VertexArray>& vertexArray, uint32_t indexCount);
+		static void BlitFramebuffer(const Ref<Framebuffer>& src, const Ref<Framebuffer>& dest);
 	};
 
 }

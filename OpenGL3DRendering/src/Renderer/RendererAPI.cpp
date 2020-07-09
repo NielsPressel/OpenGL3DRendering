@@ -73,4 +73,14 @@ namespace OpenGLRendering {
 		
 		glDrawElements(GL_TRIANGLES, count, GL_UNSIGNED_INT, nullptr);
 	}
+
+	void RendererAPI::BlitFramebuffer(const Ref<Framebuffer>& src, const Ref<Framebuffer>& dest)
+	{
+		src->BindForRead();
+		dest->BindForWrite();
+
+		glBlitFramebuffer(0, 0, src->GetSettings().Width, src->GetSettings().Height, 0, 0, dest->GetSettings().Width, dest->GetSettings().Height, GL_COLOR_BUFFER_BIT, GL_NEAREST);
+
+		src->Unbind();
+	}
 }

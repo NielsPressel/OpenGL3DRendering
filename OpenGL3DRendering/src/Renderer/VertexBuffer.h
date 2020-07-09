@@ -114,11 +114,13 @@ namespace OpenGLRendering {
 	{
 	public:
 		VertexBuffer(float* vertices, uint32_t size);
+		VertexBuffer(uint32_t size);
 		~VertexBuffer();
 
 		void Bind() const;
 		void Unbind() const;
 
+		void SetData(const void* data, uint32_t size);
 		const VertexBufferLayout& GetLayout() const { return m_Layout; }
 		void SetLayout(const VertexBufferLayout& layout) { m_Layout = layout; }
 

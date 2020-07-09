@@ -78,15 +78,6 @@ namespace OpenGLRendering {
 
 	void ApplicationHandler::OnStartup()
 	{
-		// Create custom framebuffer to render to texture instead of screen
-		FramebufferSettings settings = { 1920, 1080, true, true, 8};
-		m_Framebuffer = CreateScope<Framebuffer>(settings);
-		m_Framebuffer->Unbind();
-
-		settings = { 1920, 1080 };
-		m_IntermediateFramebuffer = CreateScope<Framebuffer>(settings);
-		m_IntermediateFramebuffer->Unbind();
-
 		Renderer::Init();
 		m_Cubemap = CreateRef<Cubemap>("src/Resources/Assets/textures/cubemap/newport_loft.hdr");
 		
@@ -199,8 +190,7 @@ namespace OpenGLRendering {
 		float time = (float)glfwGetTime();
 
 		// Render to custom framebuffer to render the generated texture in an ImGui Window
-		m_Framebuffer->Bind();
-		m_CameraController->GetCamera()->SetAspectRatio((float)m_Framebuffer->GetSettings().Width / (float)m_Framebuffer->GetSettings().Height);
+		m_CameraController->GetCamera()->SetAspectRatio((float)m_FramebufferSize.x / (float)m_FramebufferSize.y);
 
 		RendererAPI::SetClearColor(m_ClearColor);
 
@@ -218,12 +208,9 @@ namespace OpenGLRendering {
 		Renderer::Submit(m_Pyramid, modelPyramid);
 		Renderer::EndScene();
 
-		m_Framebuffer->BindForRead();
-		m_IntermediateFramebuffer->BindForWrite();
+		Renderer::InvertColor();
+		Renderer::ColorGrade(m_GradingColor);
 
-		glBlitFramebuffer(0, 0, m_Framebuffer->GetSettings().Width, m_Framebuffer->GetSettings().Height, 0, 0, m_Framebuffer->GetSettings().Width, m_Framebuffer->GetSettings().Height, GL_COLOR_BUFFER_BIT, GL_NEAREST);
-
-		m_Framebuffer->Unbind();
 		RendererAPI::SetViewport(0, 0, m_Window->GetWidth(), m_Window->GetHeight());
 	}
 
@@ -304,11 +291,6 @@ namespace OpenGLRendering {
 				{
 					ImGui::ColorEdit4("Base Color", (float*)&mesh.GetMaterial()->GetBaseColor());
 
-					// for (const Ref<Texture2D>& texture : mesh.GetMaterial()->GetTextures())
-					// {
-					// 	ImGui::Text(texture->GetPath().c_str());
-					// }
-
 					ImGui::TreePop();
 				}
 
@@ -335,7 +317,7 @@ namespace OpenGLRendering {
 		ImGui::DragFloat3("Camera Position", (float*)&m_CameraController->GetPosition());
 		ImGui::DragFloat3("Light Position", (float*)&m_LightPos);
 		ImGui::ColorEdit3("Light Color", (float*)&m_LightColor);
-		ImGui::ColorEdit4("Clear Color", (float*)&m_ClearColor);
+		ImGui::ColorEdit4("Grading Color", (float*)&m_GradingColor);
 		ImGui::End();
 
 		m_Model->SetTranslation(translation);
@@ -369,13 +351,14 @@ namespace OpenGLRendering {
 		ImGui::Begin("Viewport");
 
 		ImVec2 size = ImGui::GetContentRegionAvail();
-		const FramebufferSettings& framebufferSettings = m_Framebuffer->GetSettings();
-		if (framebufferSettings.Width != size.x || framebufferSettings.Height != size.y)
+		if (m_FramebufferSize.x != size.x || m_FramebufferSize.y != size.y && size.x > 0 && size.y > 0)
 		{
-			m_Framebuffer->Resize(size.x, size.y);
-			m_IntermediateFramebuffer->Resize(size.x, size.y);
+			Renderer::OnResize((uint32_t)size.x, (uint32_t)size.y);
+
+			m_FramebufferSize.x = size.x;
+			m_FramebufferSize.y = size.y;
 		}
-		ImGui::Image((void*)m_IntermediateFramebuffer->GetColorTextureId(), size, { 0, 1 }, { 1, 0 });
+		ImGui::Image((void*)Renderer::GetFrameTextureId(), size, { 0, 1 }, { 1, 0 });
 
 		ImGui::End();
 		ImGui::PopStyleVar();

@@ -1,8 +1,8 @@
 #include "oglpch.h"
 
 #include "Renderer.h"
-
 #include "RendererAPI.h"
+#include "Framebuffer.h"
 
 namespace OpenGLRendering {
 
@@ -23,9 +23,17 @@ namespace OpenGLRendering {
 		Ref<Shader> PBRShader;
 		Ref<Shader> CubemapShader;
 		Ref<Shader> ColorGradingShader;
+		Ref<Shader> InvertColorShader;
+
+		Ref<Framebuffer> MultisampleFramebuffer;
+		Ref<Framebuffer> IntermediateFramebuffer;
+		Ref<Framebuffer> FinalFramebuffer;
 
 		std::vector<MeshInfo> Meshes;
 		LightInfo LightInfo;
+		Ref<VertexArray> QuadVertexArray;
+		
+		bool RenderedToFinalBuffer;
 
 		RendererStats Stats;
 	};
@@ -38,6 +46,47 @@ namespace OpenGLRendering {
 		s_RendererData.PBRShader = CreateRef<Shader>("src/Resources/ShaderSource/PBR/vertex_static_pbr.glsl", "src/Resources/ShaderSource/PBR/fragment_static_pbr.glsl");
 		s_RendererData.CubemapShader = CreateRef<Shader>("src/Resources/ShaderSource/Cubemap/background_vertex.glsl", "src/Resources/ShaderSource/Cubemap/background_fragment.glsl");
 		s_RendererData.ColorGradingShader = CreateRef<Shader>("src/Resources/ShaderSource/PostProcessing/color_grading_vertex.glsl", "src/Resources/ShaderSource/PostProcessing/color_grading_fragment.glsl");
+		s_RendererData.InvertColorShader = CreateRef<Shader>("src/Resources/ShaderSource/PostProcessing/color_invert_vertex.glsl", "src/Resources/ShaderSource/PostProcessing/color_invert_fragment.glsl");
+
+		float quadVertices[] =
+		{
+			-1.0f, -1.0f, 0.0f, 0.0f, 0.0f,
+			 1.0f, -1.0f, 0.0f, 1.0f, 0.0f,
+			 1.0f,  1.0f, 0.0f, 1.0f, 1.0f,
+			-1.0f,  1.0f, 0.0f, 0.0f, 1.0f,
+		};
+
+		uint32_t quadIndices[] =
+		{
+			0, 1, 2,
+			0, 2, 3,
+		};
+
+		s_RendererData.QuadVertexArray = CreateRef<VertexArray>();
+		
+		Ref<VertexBuffer> vb = CreateRef<VertexBuffer>(quadVertices, 5 * 4 * 4);
+		vb->SetLayout(
+		{
+			{ ShaderDataType::Float3, "a_Position" },
+			{ ShaderDataType::Float2, "a_TexCoords" },
+		});
+
+		Ref<IndexBuffer> ib = CreateRef<IndexBuffer>(quadIndices, 6);
+		s_RendererData.QuadVertexArray->AddVertexBuffer(vb);
+		s_RendererData.QuadVertexArray->SetIndexBuffer(ib);
+
+		FramebufferSettings settings = { 1920, 1080, true, true, 8 };
+		s_RendererData.MultisampleFramebuffer = CreateRef<Framebuffer>(settings);
+		settings = { 1920, 1080 };
+		s_RendererData.IntermediateFramebuffer = CreateRef<Framebuffer>(settings);
+		s_RendererData.FinalFramebuffer = CreateRef<Framebuffer>(settings);
+	}
+
+	void Renderer::OnResize(uint32_t width, uint32_t height)
+	{
+		s_RendererData.MultisampleFramebuffer->Resize(width, height);
+		s_RendererData.IntermediateFramebuffer->Resize(width, height);
+		s_RendererData.FinalFramebuffer->Resize(width, height);
 	}
 
 	void Renderer::BeginScene(Ref<Camera>& camera, Ref<Cubemap>& cubemap, const LightInfo& lightInfo)
@@ -49,10 +98,12 @@ namespace OpenGLRendering {
 		s_RendererData.Stats.VertexCount = 0;
 		s_RendererData.Stats.FaceCount = 0;
 		s_RendererData.Stats.DrawCalls = 0;
+		s_RendererData.RenderedToFinalBuffer = false;
 	}
 
 	void Renderer::EndScene()
 	{
+		s_RendererData.MultisampleFramebuffer->Bind();
 		RendererAPI::Clear();
 
 		s_RendererData.Cubemap->BindIrradianceMap(0);
@@ -138,6 +189,8 @@ namespace OpenGLRendering {
 		s_RendererData.Stats.DrawCalls += 1;
 
 		s_RendererData.Meshes.clear();
+
+		RendererAPI::BlitFramebuffer(s_RendererData.MultisampleFramebuffer, s_RendererData.IntermediateFramebuffer);
 	}
 
 	void Renderer::Submit(Ref<Mesh>& mesh, const glm::mat4& modelMatrix)
@@ -170,11 +223,59 @@ namespace OpenGLRendering {
 
 	void Renderer::ColorGrade(const glm::vec4& color)
 	{
+		if (s_RendererData.RenderedToFinalBuffer)
+			s_RendererData.IntermediateFramebuffer->Bind();
+		else
+			s_RendererData.FinalFramebuffer->Bind();
+		
 
+		RendererAPI::Clear();
+
+		if (s_RendererData.RenderedToFinalBuffer)
+			s_RendererData.FinalFramebuffer->BindColorTexture(0);
+		else
+			s_RendererData.IntermediateFramebuffer->BindColorTexture(0);
+		
+		s_RendererData.ColorGradingShader->Bind();
+		s_RendererData.ColorGradingShader->SetInt("u_Frame", 0);
+		s_RendererData.ColorGradingShader->SetFloat4("u_GradingColor", color);
+
+		RendererAPI::DrawIndexed(s_RendererData.QuadVertexArray, 0);
+
+		s_RendererData.RenderedToFinalBuffer = !s_RendererData.RenderedToFinalBuffer;
+		s_RendererData.FinalFramebuffer->Unbind();
+	}
+
+	void Renderer::InvertColor()
+	{
+		if (s_RendererData.RenderedToFinalBuffer)
+			s_RendererData.IntermediateFramebuffer->Bind();
+		else
+			s_RendererData.FinalFramebuffer->Bind();
+
+		RendererAPI::Clear();
+
+		if (s_RendererData.RenderedToFinalBuffer)
+			s_RendererData.FinalFramebuffer->BindColorTexture(0);
+		else
+			s_RendererData.IntermediateFramebuffer->BindColorTexture(0);
+
+		s_RendererData.InvertColorShader->Bind();
+		s_RendererData.InvertColorShader->SetInt("u_Frame", 0);
+
+		RendererAPI::DrawIndexed(s_RendererData.QuadVertexArray, 0);
+
+		s_RendererData.RenderedToFinalBuffer = !s_RendererData.RenderedToFinalBuffer;
+		s_RendererData.FinalFramebuffer->Unbind();
 	}
 
 	const RendererStats& Renderer::GetStatistics()
 	{
 		return s_RendererData.Stats;
+	}
+
+	uint32_t Renderer::GetFrameTextureId()
+	{
+		return s_RendererData.RenderedToFinalBuffer ? s_RendererData.FinalFramebuffer->GetColorTextureId() : s_RendererData.IntermediateFramebuffer->GetColorTextureId();
 	}
 }

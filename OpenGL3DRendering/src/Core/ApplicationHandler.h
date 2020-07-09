@@ -47,8 +47,7 @@ namespace OpenGLRendering {
 		Scope<Window> m_Window;
 		Scope<ImGuiLayer> m_ImGuiLayer;
 		Scope<CameraController> m_CameraController;
-		Scope<Framebuffer> m_Framebuffer;
-		Scope<Framebuffer> m_IntermediateFramebuffer;
+		glm::vec2 m_FramebufferSize = { 1920.0f, 1080.0f };
 		
 		Ref<Model> m_Model;
 		Ref<Mesh> m_Sphere;
@@ -59,6 +58,7 @@ namespace OpenGLRendering {
 		glm::vec3 m_LightPos = { 0.0f, 0.0f, 4.0f };
 		glm::vec3 m_LightColor = { 1.0f, 1.0f, 1.0f };
 		glm::vec4 m_ClearColor = { 0.0f, 0.0f, 0.0f, 1.0f };
+		glm::vec4 m_GradingColor = { 1.0f, 1.0f, 1.0f, 1.0f };
 	};
 
 } // namespace OpenGLRendering

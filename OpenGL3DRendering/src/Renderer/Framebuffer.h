@@ -29,6 +29,7 @@ namespace OpenGLRendering {
 
 		void BindForRead() const;
 		void BindForWrite() const;
+		void BindColorTexture(uint32_t slot) const;
 
 		void SetSettings(const FramebufferSettings& settings) { m_Settings = settings; }
 		uint32_t GetColorTextureId() const { return m_ColorTextureId; }
